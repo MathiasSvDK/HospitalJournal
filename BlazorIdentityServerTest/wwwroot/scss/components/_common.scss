@@ -1,4 +1,21 @@
+@import "./colors";
+
 h1 {
-  outline: none;
+	outline: none;
 }
 
+
+
+.navbar-brand {
+	opacity: 1 !important;
+	i {
+		color: $blue;
+		font-size: 20px;
+	}
+	a {
+		text-decoration: none;
+		&:hover {
+			filter: brightness(1.2);
+		}
+	}
+}

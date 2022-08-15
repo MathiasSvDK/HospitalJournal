@@ -2,4 +2,18 @@ h1 {
   outline: none;
 }
 
+.navbar-brand {
+  opacity: 1 !important;
+}
+.navbar-brand i {
+  color: #206bc4;
+  font-size: 20px;
+}
+.navbar-brand a {
+  text-decoration: none;
+}
+.navbar-brand a:hover {
+  filter: brightness(1.2);
+}
+
 /*# sourceMappingURL=site.css.map */
