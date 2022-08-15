@@ -1,0 +1,120 @@
+@page "/admin/ansatte"
+
+
+<div class="page-body">
+	<div class="container-xl">
+		<div class="page-header mb-3">
+			<div class="row align-items-center mw-100">
+				<div class="col">
+					<div class="mb-1">
+						<ol class="breadcrumb" aria-label="breadcrumbs">
+							<li class="breadcrumb-item"><a href="#">Administrator</a></li>
+							<li class="breadcrumb-item active" aria-current="page"><a href="#">Ansatte</a></li>
+						</ol>
+					</div>
+					<h2 class="page-title">
+						<span class="text-truncate">Ansatte</span>
+					</h2>
+				</div>
+				<div class="col-auto">
+					<div class="btn-list">
+						<a href="#" class="btn btn-primary">
+							Gem ændringer
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12 col-md-4 px-4">
+				<NavMenu />
+			</div>
+			<div class="col-12 col-md-8">
+				<div class="row">
+					<div class="col-12">
+						<div class="card">
+							<div class="card-header">
+								<h3 class="card-title">Account</h3>
+							</div>
+							<div class="card-body">
+								<form data-nordpass-autofill="register" data-np-checked="1" data-nordpass-watching="1">
+									<div class="form-group mb-3 row">
+										<label class="col-3 col-form-label required">Email address</label>
+										<div class="col">
+											<input type="email" class="form-control" aria-describedby="emailHelp"
+												placeholder="Enter email" data-nordpass-autofill="identity_email"
+												data-nordpass-uid="j07uw2s28nr" autocomplete="off" data-np-checked="1">
+											<small class="form-hint">We'll never share your email with anyone
+												else.</small>
+											<span data-nordpass-uid="j07uw2s28nr"
+												style="width: 24px; min-width: 24px; height: 24px; background-image: url(&quot;chrome-extension://fooolghllnmhmmndgjiamiiodkpenpbb/icons/icon.svg&quot;); background-repeat: no-repeat; background-position: left center; background-size: auto; border: none; display: inline; visibility: visible; position: absolute; cursor: pointer; z-index: 1001; padding: 0px; transition: none 0s ease 0s; pointer-events: all; right: 0px; left: 705.069px; top: 78px;"></span>
+										</div>
+									</div>
+									<div class="form-group mb-3 row">
+										<label class="col-3 col-form-label required">Password</label>
+										<div class="col">
+											<input type="password" class="form-control" placeholder="Password"
+												data-nordpass-autofill="generate" data-nordpass-uid="myis66k0ma"
+												autocomplete="off" data-np-checked="1">
+											<small class="form-hint">
+												Your password must be 8-20 characters long, contain letters and numbers,
+												and must not contain
+												spaces, special characters, or emoji.
+											</small>
+											<span data-nordpass-uid="myis66k0ma"
+												style="width: 24px; min-width: 24px; height: 24px; background-image: url(&quot;chrome-extension://fooolghllnmhmmndgjiamiiodkpenpbb/icons/icon.svg&quot;); background-repeat: no-repeat; background-position: left center; background-size: auto; border: none; display: inline; visibility: visible; position: absolute; cursor: pointer; z-index: 1001; padding: 0px; transition: none 0s ease 0s; pointer-events: all; right: 0px; left: 705.069px; top: 155.139px;"></span>
+										</div>
+									</div>
+									<div class="form-group mb-3 row">
+										<label class="col-3 col-form-label">Select</label>
+										<div class="col">
+											<select class="form-select">
+												<option>Option 1</option>
+												<optgroup label="Optgroup 1">
+													<option>Option 1</option>
+													<option>Option 2</option>
+												</optgroup>
+												<option>Option 2</option>
+												<optgroup label="Optgroup 2">
+													<option>Option 1</option>
+													<option>Option 2</option>
+												</optgroup>
+												<optgroup label="Optgroup 3">
+													<option>Option 1</option>
+													<option>Option 2</option>
+												</optgroup>
+												<option>Option 3</option>
+												<option>Option 4</option>
+											</select>
+										</div>
+									</div>
+									<div class="form-group row">
+										<label class="col-3 col-form-label pt-0">Checkboxes</label>
+										<div class="col">
+											<label class="form-check">
+												<input class="form-check-input" type="checkbox" checked=""
+													data-np-checked="1">
+												<span class="form-check-label">Option 1</span>
+											</label>
+											<label class="form-check">
+												<input class="form-check-input" type="checkbox" data-np-checked="1">
+												<span class="form-check-label">Option 2</span>
+											</label>
+											<label class="form-check">
+												<input class="form-check-input" type="checkbox" disabled="">
+												<span class="form-check-label">Option 3</span>
+											</label>
+										</div>
+									</div>
+									<div class="form-footer">
+										<button type="submit" class="btn btn-primary">Submit</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
