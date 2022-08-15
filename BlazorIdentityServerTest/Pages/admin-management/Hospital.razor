@@ -1,0 +1,100 @@
+@page "/admin/generelt"
+@inject HospitalService _hospitalService
+
+<div class="page-body">
+    <div class="container-xl">
+        <div class="page-header mb-3">
+            <div class="row align-items-center mw-100">
+                <div class="col">
+                    <div class="mb-1">
+                        <ol class="breadcrumb" aria-label="breadcrumbs">
+                            <li class="breadcrumb-item"><a href="#">Administrator</a></li>
+                            <li class="breadcrumb-item active" aria-current="page"><a href="#">Ansatte</a></li>
+                        </ol>
+                    </div>
+                    <h2 class="page-title">
+                        <span class="text-truncate">Ansatte</span>
+                    </h2>
+                </div>
+                <div class="col-auto">
+                    <div class="btn-list">
+                        <a href="#" class="btn btn-primary">
+                            Tilføj nyt hospital
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-4 px-4">
+                <NavMenu CurrentPage="generelt" />
+            </div>
+            <div class="col-12 col-md-8">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row row-cards">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Generelle Indstillinger</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group mb-3 row">
+                                        <label class="col-3 col-form-label required">Hospitals Navn</label>
+                                        <div class="col">
+                                            <input type="text" class="form-control" placeholder="Indtast navn"
+                                                @bind-value="@HospitalObj.Name">
+                                            <small class="form-hint">We'll never share your email with anyone
+                                                else.</small>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mb-3 row">
+                                        <label class="col-3 col-form-label required">Adresse</label>
+                                        <div class="col">
+                                            <input type="text" class="form-control" placeholder="Indtast navn"
+                                                @bind-value="@HospitalObj.Address">
+                                        </div>
+                                    </div>
+                                    <div class="form-group mb-3 row">
+                                        <label class="col-3 col-form-label required">Senge pladser</label>
+                                        <div class="col">
+                                            <input type="text" class="form-control" placeholder="Indtast navn"
+                                                @bind-value="@HospitalObj.Beds">
+                                        </div>
+                                    </div>
+                                    <div class="form-footer">
+                                        <button @onclick="SaveChanges" class="btn btn-primary">Gem ændringer</button>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    public Models.Hospital HospitalObj { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        HospitalObj = _hospitalService.GetHospital(1);
+    }
+
+    public async void SaveChanges()
+    {
+        try
+        {
+            _hospitalService.Update(HospitalObj);
+            _hospitalService.Save();
+            await Swal.FireAsync("Fuldført", "Ændringerne er blevet gemt!", "success");
+        }
+        catch (System.Exception)
+        {
+        await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen.", "error");
+        }
+    }
+}

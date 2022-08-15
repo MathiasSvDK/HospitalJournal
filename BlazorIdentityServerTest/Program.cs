@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using BlazorIdentityServerTest.Services;
 using BlazorIdentityServerTest.Models;
+using CurrieTechnologies.Razor.SweetAlert2;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,8 +29,10 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<EmployeeService>();
+builder.Services.AddScoped<HospitalService>();
 builder.Services.AddDbContext<HospitalContext>();
 builder.Services.AddDbContext<JournalContext>();
+builder.Services.AddSweetAlert2();
 
 builder.Services.Configure<IdentityServerSettings>(builder.Configuration.GetSection("IdentityServerSettings"));
 builder.Services.AddScoped<ITokenService, TokenService>();
