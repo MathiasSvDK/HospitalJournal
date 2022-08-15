@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using BlazorIdentityServerTest.Services;
+using BlazorIdentityServerTest.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +27,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddScoped<EmployeeService>();
+builder.Services.AddDbContext<HospitalContext>();
+builder.Services.AddDbContext<JournalContext>();
 
 builder.Services.Configure<IdentityServerSettings>(builder.Configuration.GetSection("IdentityServerSettings"));
 builder.Services.AddScoped<ITokenService, TokenService>();
