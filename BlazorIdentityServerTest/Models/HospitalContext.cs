@@ -42,6 +42,10 @@ namespace BlazorIdentityServerTest.Models
                     .HasColumnType("int(11)")
                     .HasColumnName("id");
 
+                entity.Property(e => e.Email)
+                    .HasMaxLength(255)
+                    .HasColumnName("email");
+
                 entity.Property(e => e.Firstname)
                     .HasMaxLength(255)
                     .HasColumnName("firstname");

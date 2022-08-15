@@ -18,5 +18,22 @@ namespace BlazorIdentityServerTest.Services
         {
             return _hospitalContext.Employees.ToList();
         }
+
+        public string ConvertRole(int role) {
+            switch (role)
+            {
+                case 0:
+                    return "Admin";
+                    break;
+                case 1:
+                    return "Læge";
+                    break;
+                case 2:
+                    return "Sygeplejerske";
+                    break;
+                default:
+                    return "Fejl";
+            }
+        }
     }
 }
