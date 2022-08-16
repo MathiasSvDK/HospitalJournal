@@ -16,4 +16,35 @@ h1 {
   filter: brightness(1.2);
 }
 
+.swal2-styled.swal2-confirm {
+  background-color: #206bc4 !important;
+}
+.swal2-styled.swal2-confirm:focus {
+  box-shadow: 0 0 0 3px rgba(32, 107, 196, 0.5) !important;
+}
+
+.swal2-actions {
+  flex-direction: row-reverse;
+}
+
+.employee-fire {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  opacity: 0.7;
+  color: #161616;
+  background: rgb(222, 222, 222);
+  padding: 2px;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  transition: all 0.1s ease-out;
+}
+.employee-fire:hover {
+  box-shadow: rgba(30, 41, 59, 0.1) 0 2px 4px 0;
+  cursor: pointer;
+  margin-top: -3px;
+  filter: brightness(1.05);
+}
+
 /*# sourceMappingURL=site.css.map */

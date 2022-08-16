@@ -41,7 +41,20 @@
 										x.Firstname))
 								{
 									<div class="col-md-6 col-lg-3">
-										<div class="card">
+										<div class="card employee">
+											<svg xmlns="http://www.w3.org/2000/svg"
+										class="employee-fire icon icon-tabler icon-tabler-trash-x" width="24"
+										height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+										fill="none" stroke-linecap="round" stroke-linejoin="round"
+										@onclick="() => Fire(item)">
+												<path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+												<path d="M4 7h16"></path>
+												<path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+												<path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+												<path d="M10 12l4 4m0 -4l-4 4"></path>
+											</svg>
+
+
 											<div class="card-body p-4 text-center">
 												<span class="avatar avatar-xl mb-3 avatar-rounded"
 											style="background-image: url('./static/avatars/(@item.Id).jpg')"></span>
@@ -93,7 +106,8 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title">Ny medarbejder</h5>
-				<button @onclick="ClearNewEmployee" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				<button @onclick="ClearNewEmployee" type="button" class="btn-close" data-bs-dismiss="modal"
+					aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
 				<div class="row">
@@ -197,7 +211,7 @@
 	protected override async Task OnInitializedAsync()
 	{
 		NewEmployee = new Employee();
-		EmployeeList = _employeeService.GetEmployees();
+		EmployeeList = _employeeService.GetEmployees(1);
 	}
 
 	public async void CreateEmployee()
@@ -206,9 +220,9 @@
 		{
 			_employeeService.AddEmployee(NewEmployee);
 			_employeeService.Save();
-			EmployeeList = _employeeService.GetEmployees();
+			EmployeeList = _employeeService.GetEmployees(1);
 			NewEmployee = new Employee();
-			await Swal.FireAsync("Fuldført", "Ændringerne er blevet gemt!", "success");
+			await Swal.FireAsync("Fuldført", "Medarbejderen er blevet tilføjet", "success");
 		}
 		catch (System.Exception)
 		{
@@ -219,5 +233,40 @@
 	public void ClearNewEmployee()
 	{
 		NewEmployee = new Employee();
+	}
+
+	public async void Fire(Employee emp)
+	{
+		SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+		{
+			Title = "Er du sikker?",
+			Html = string.Format("Du er ved at fjerne <b><u>{0}</u></b> som medarbejder!",emp.Firstname),
+			Icon = SweetAlertIcon.Warning,
+			ShowCancelButton = true,
+			ConfirmButtonText = "Ja, fjern!",
+			CancelButtonText = "Annuller"
+		});
+
+		if (!string.IsNullOrEmpty(result.Value))
+		{
+
+			try
+			{
+				_employeeService.Fire(emp);
+				_employeeService.Save();
+				EmployeeList = _employeeService.GetEmployees(1);
+				StateHasChanged();
+				await Swal.FireAsync("Fuldført", string.Format("{0} er blevet fjernet", emp.Firstname), "success");
+			}
+			catch (System.Exception)
+			{
+				await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen.", "error");
+			}
+		}
+
+
+
+
+
 	}
 }

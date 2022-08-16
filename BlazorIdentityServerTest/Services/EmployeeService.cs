@@ -18,6 +18,10 @@ namespace BlazorIdentityServerTest.Services
         {
             return _hospitalContext.Employees.ToList();
         }
+        public List<Employee> GetEmployees(int id)
+        {
+            return _hospitalContext.Employees.Where(x => x.HospitalId == id).ToList();
+        }
 
 
         public void AddEmployee(Employee emp)
@@ -32,6 +36,10 @@ namespace BlazorIdentityServerTest.Services
 
         public int GetCount(int id) {
             return _hospitalContext.Employees.Where(x => x.HospitalId == id).Count();
+        }
+
+        public void Fire(Employee emp) {
+            _hospitalContext.Remove(emp);
         }
 
 
