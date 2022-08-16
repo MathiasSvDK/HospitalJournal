@@ -8,8 +8,8 @@
 				<div class="col">
 					<div class="mb-1">
 						<ol class="breadcrumb" aria-label="breadcrumbs">
-							<li class="breadcrumb-item"><a href="#">Administrator</a></li>
-							<li class="breadcrumb-item active" aria-current="page"><a href="#">Ansatte</a></li>
+							<li class="breadcrumb-item"><a href="/admin">Administrator</a></li>
+							<li class="breadcrumb-item active" aria-current="page"><a>Ansatte</a></li>
 						</ol>
 					</div>
 					<h2 class="page-title">
@@ -18,7 +18,7 @@
 				</div>
 				<div class="col-auto">
 					<div class="btn-list">
-						<a href="#" class="btn btn-primary">
+						<a data-bs-toggle="modal" data-bs-target="#modal-newemployee" class="btn btn-primary">
 							Tilføj medarbejder
 						</a>
 					</div>
@@ -36,8 +36,10 @@
 
 							@foreach (int role in EmployeeList.Select(x => x.Role).OrderBy(x => x).Distinct().ToList())
 							{
-								<p style="font-weight:bolder;margin-bottom:0;margin-top:10px;">@_employeeService.ConvertRole(role)</p>
-								@foreach (Employee item in EmployeeList.Where(x => x.Role == role).OrderBy(x => x.Firstname))
+								<p style="font-weight:bolder;margin-bottom:0;margin-top:10px;">
+									@_employeeService.ConvertRole(role)</p>
+								@foreach (Employee item in EmployeeList.Where(x => x.Role == role).OrderBy(x =>
+										x.Firstname))
 								{
 									<div class="col-md-6 col-lg-3">
 										<div class="card">
@@ -87,10 +89,138 @@
 </div>
 
 
+
+
+<div class="modal modal-blur fade" id="modal-newemployee" tabindex="-1" style="display: none;" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Ny medarbejder</h5>
+				<button @onclick="ClearNewEmployee" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-lg-6">
+						<div class="mb-3">
+							<label class="form-label">Fornavn</label>
+							<input type="text" class="form-control" @bind="NewEmployee.Firstname">
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="mb-3">
+							<label class="form-label">Efternavn</label>
+							<input type="text" class="form-control" @bind="NewEmployee.Lastname">
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-6">
+						<div class="mb-3">
+							<label class="form-label">Mobil nr</label>
+							<input type="text" class="form-control" @bind="NewEmployee.Mobilnr">
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="mb-3">
+							<label class="form-label">Email</label>
+							<input type="email" class="form-control" @bind="NewEmployee.Email">
+						</div>
+					</div>
+				</div>
+				<label class="form-label">Rolle</label>
+				<div class="form-selectgroup-boxes row mb-3">
+					<div class="col-lg-4">
+						<label @onclick="() => NewEmployee.Role = 1" class="form-selectgroup-item">
+							<input type="radio" name="report-type" value="1" class="form-selectgroup-input" checked=""
+								data-np-invisible="1">
+							<span class="form-selectgroup-label d-flex align-items-center p-3">
+								<span class="me-3">
+									<span class="form-selectgroup-check"></span>
+								</span>
+								<span class="form-selectgroup-label-content">
+									<span class="form-selectgroup-title strong mb-1">Læge</span>
+								</span>
+							</span>
+						</label>
+					</div>
+					<div class="col-lg-4">
+						<label @onclick="() => NewEmployee.Role = 2" class="form-selectgroup-item">
+							<input type="radio" name="report-type" value="1" class="form-selectgroup-input"
+								data-np-invisible="1">
+							<span class="form-selectgroup-label d-flex align-items-center p-3">
+								<span class="me-3">
+									<span class="form-selectgroup-check"></span>
+								</span>
+								<span class="form-selectgroup-label-content">
+									<span class="form-selectgroup-title strong mb-1">Sygeplejerske</span>
+								</span>
+							</span>
+						</label>
+					</div>
+					<div class="col-lg-4">
+						<label @onclick="() => NewEmployee.Role = 0" class="form-selectgroup-item">
+							<input type="radio" name="report-type" value="1" class="form-selectgroup-input"
+								data-np-invisible="1">
+							<span class="form-selectgroup-label d-flex align-items-center p-3">
+								<span class="me-3">
+									<span class="form-selectgroup-check"></span>
+								</span>
+								<span class="form-selectgroup-label-content">
+									<span class="form-selectgroup-title strong mb-1">Admin</span>
+								</span>
+							</span>
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<a class="btn btn-link link-secondary" data-bs-dismiss="modal" @onclick="ClearNewEmployee">
+					Annuller
+				</a>
+				<a @onclick="CreateEmployee" class="btn btn-primary ms-auto" data-bs-dismiss="modal">
+					<!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+					<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+						stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+						stroke-linejoin="round">
+						<path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+						<line x1="12" y1="5" x2="12" y2="19"></line>
+						<line x1="5" y1="12" x2="19" y2="12"></line>
+					</svg>
+					Opret medarbejder
+				</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+
 @code {
 	public List<Employee> EmployeeList { get; set; }
+	public Employee NewEmployee { get; set; }
 	protected override async Task OnInitializedAsync()
 	{
+		NewEmployee = new Employee();
 		EmployeeList = _employeeService.GetEmployees();
+	}
+
+	public async void CreateEmployee()
+	{
+		try
+		{
+			_employeeService.AddEmployee(NewEmployee);
+			_employeeService.Save();
+			EmployeeList = _employeeService.GetEmployees();
+			NewEmployee = new Employee();
+			await Swal.FireAsync("Fuldført", "Ændringerne er blevet gemt!", "success");
+		}
+		catch (System.Exception)
+		{
+			await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen.", "error");
+		}
+	}
+
+	public void ClearNewEmployee()
+	{
+		NewEmployee = new Employee();
 	}
 }

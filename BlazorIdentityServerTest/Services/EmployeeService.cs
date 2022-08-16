@@ -19,7 +19,19 @@ namespace BlazorIdentityServerTest.Services
             return _hospitalContext.Employees.ToList();
         }
 
-        public string ConvertRole(int role) {
+
+        public void AddEmployee(Employee emp)
+        {
+            _hospitalContext.Add(emp);
+        }
+
+        public void Save() {
+            _hospitalContext.SaveChanges();
+        }
+
+
+        public string ConvertRole(int role)
+        {
             switch (role)
             {
                 case 0:
