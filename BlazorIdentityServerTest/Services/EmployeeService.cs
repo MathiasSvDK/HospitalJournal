@@ -30,6 +30,11 @@ namespace BlazorIdentityServerTest.Services
         }
 
 
+        public int GetCount(int id) {
+            return _hospitalContext.Employees.Where(x => x.HospitalId == id).Count();
+        }
+
+
         public string ConvertRole(int role)
         {
             switch (role)

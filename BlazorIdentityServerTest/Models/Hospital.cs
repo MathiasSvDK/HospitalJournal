@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlazorIdentityServerTest.Models
 {
@@ -9,5 +10,7 @@ namespace BlazorIdentityServerTest.Models
         public string? Name { get; set; }
         public string? Address { get; set; }
         public int? Beds { get; set; }
+        [NotMapped]
+        public int EmployeeCount {get;set;}
     }
 }

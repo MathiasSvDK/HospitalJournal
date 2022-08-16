@@ -1,5 +1,6 @@
 @page "/admin"
 @inject HospitalService _hospitalService
+@inject EmployeeService _employeeService
 
 <div class="page-body">
     <div class="container-xl">
@@ -66,8 +67,38 @@
                                     </div>
                                 </div>
                             </div>
-
-
+                        </div>
+                    </div>
+                    <div class="col-12" style="margin-top:40px">
+                        <div class="row row-cards">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Alle hospitaler</h3>
+                                    </div>
+                                    <div class="card-table table-responsive">
+                                    <table class="table table-vcenter">
+                                    <thead>
+                                        <tr>
+                                        <th>Navn</th>
+                                        <th>Addresse</th>
+                                        <th>Antal senge</th>
+                                        <th>Antal ansatte</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (Models.Hospital item in HospitalList)
+                                            {
+                                            <tr>
+                                                <td><b>@item.Name</b></td>
+                                                <td>@item.Address</td>
+                                                <td>@item.Beds</td>
+                                                <td>@item.EmployeeCount</td>
+                                            </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -79,9 +110,12 @@
 
 @code {
     public Models.Hospital HospitalObj { get; set; }
+    public List<Models.Hospital> HospitalList { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        HospitalObj = _hospitalService.GetHospital(1);
+        HospitalObj = _hospitalService.Get(1);
+        HospitalList = _hospitalService.Get();
+        HospitalList.ForEach(x => x.EmployeeCount = _employeeService.GetCount(x.Id));
     }
 
     public async void SaveChanges()
@@ -94,7 +128,7 @@
         }
         catch (System.Exception)
         {
-        await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen.", "error");
+            await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen.", "error");
         }
     }
 }

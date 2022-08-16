@@ -15,10 +15,15 @@ namespace BlazorIdentityServerTest.Services
             _hospitalContext = _context;
         }
 
-        public Hospital GetHospital(int id)
+        public List<Hospital> Get() {
+            return _hospitalContext.Hospitals.ToList();
+        }
+
+        public Hospital Get(int id)
         {
             return _hospitalContext.Hospitals.Where(x => x.Id == id).FirstOrDefault();
         }
+
 
         public void Update(Hospital hospital)
         {
