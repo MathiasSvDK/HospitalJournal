@@ -1,10 +1,32 @@
 ﻿@inherits LayoutComponentBase
 
+@inject NavigationManager _navMan
 <PageTitle>BlazorIdentityServerTest</PageTitle>
 
-<Header />
-<LoginDisplay />
 
-<div class="page-wrapper">
-    @Body
-</div>
+<AuthorizeView>
+    <Authorized>
+        <Header />
+        <div class="page-wrapper">
+            @Body
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <!---->
+    </NotAuthorized>
+</AuthorizeView>
+
+
+
+@code {
+    [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
+    protected async override Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        var user = (await AuthStat).User;
+        if (!user.Identity.IsAuthenticated)
+        {
+            _navMan.NavigateTo($"/Identity/Account/Login");
+        }
+    }
+}

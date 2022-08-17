@@ -8,22 +8,6 @@
 
 
 
-<button @onclick="GetClaimsPrincipalData">Get ClaimsPrincipal Data</button>
-
-<p>@authMessage</p>
-
-@if (claims.Count() > 0)
-{
-    <ul>
-        @foreach (var claim in claims)
-        {
-            <li>@claim.Type: @claim.Value</li>
-        }
-    </ul>
-}
-
-
-
 <div class="container-xl">
     <!-- Page title -->
     <div class="page-header d-print-none">
@@ -78,26 +62,13 @@
 @code {
 
     
-    private string authMessage;
-    private string surnameMessage;
     private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
 
     private async Task GetClaimsPrincipalData()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-
-        if (user.Identity.IsAuthenticated)
-        {
-            authMessage = $"{user.Identity.Name} is authenticated.";
-            claims = user.Claims;
-            surnameMessage = 
-                $"Surname: {user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value}";
-        }
-        else
-        {
-            authMessage = "The user is NOT authenticated.";
-        }
+        claims = user.Claims;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
