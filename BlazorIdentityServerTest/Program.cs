@@ -52,7 +52,7 @@ builder.Services.AddAuthentication(options =>
             options.Authority = builder.Configuration["InteractiveServiceSettings:AuthorityUrl"];
             options.ClientId = builder.Configuration["InteractiveServiceSettings:ClientId"];
             options.ClientSecret = builder.Configuration["InteractiveServiceSettings:ClientSecret"];
-
+            options.RequireHttpsMetadata = false;
             options.ResponseType = "code";
             options.SaveTokens = true;
             options.GetClaimsFromUserInfoEndpoint = true;

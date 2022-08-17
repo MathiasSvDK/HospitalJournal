@@ -1,8 +1,8 @@
-﻿<div style="display:none">
+﻿<div>
     <AuthorizeView>
         <Authorized>
             <a href="Identity/Account/Manage">Hello, @context.User.Claims.FirstOrDefault(c => c.Type ==
-                "name").Value</a>
+                "firstname").Value</a>
             <form method="get" action="Identity/Account/LogOut">
                 <button type="submit" class="nav-link btn btn-link">Log out</button>
             </form>

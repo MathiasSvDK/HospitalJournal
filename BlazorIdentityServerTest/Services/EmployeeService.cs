@@ -60,5 +60,23 @@ namespace BlazorIdentityServerTest.Services
                     return "Fejl";
             }
         }
+
+        public string ConvertRole(string role)
+        {
+            switch (role)
+            {
+                case "0":
+                    return "Admin";
+                    break;
+                case "1":
+                    return "Læge";
+                    break;
+                case "2":
+                    return "Sygeplejerske";
+                    break;
+                default:
+                    return "Fejl";
+            }
+        }
     }
 }
