@@ -1,11 +1,6 @@
 @page "/Journal/Create"
-@using Microsoft.AspNetCore.Identity;
-@inject UserManager<ApplicationUser> UserManager;
-@inject SignInManager<ApplicationUser> _signinManager;
-@inject EmployeeService _employeeService
-@inject IJSRuntime JS
 
-<IsLoading Loading="@Loading"></IsLoading>
+
 
 
 
@@ -19,54 +14,19 @@
             <div class="hr-text hr-text-center hr-text-spaceless">Patient info</div>
 
             <div class="card-body">
-                <div class="mb-3">
-                    <label class="form-label">CPR NR</label>
-                    <div class="input-group input-group-flat">
-                        <input type="text" placeholder="CPR Nr" class="form-control ps-1" @bind="CPRnr"
-                            @bind:event="oninput" @onchange="CPRInput">
-                    </div>
-                    <div class="form-hint">
-                        Indtast CPR nr på patienten og klik vertificer.
-                    </div>
-                    <a class="mt-2 btn btn-primary d-block" @onclick="LookupPatient">
-                        Vertificer
-                    </a>
-                </div>
 
-
-
-                <label class="form-label">CPR NR</label>
-                <div class="input-group input-group-flat mb-2">
-                    <input type="text" placeholder="CPR Nr" class="form-control ps-1" disabled
-                        @bind="PatientUser.NormalizedUserName">
-                </div>
-                <label class="form-label">Navn</label>
-                <div class="input-group input-group-flat mb-2">
-                    <input type="text" placeholder="CPR Nr" class="form-control ps-1" disabled
-                        value='@(PatientUser.Firstname + " " + PatientUser.Lastname)'>
-                </div>
-                <label class="form-label">Adresse</label>
-                <div class="input-group input-group-flat">
-                    <input type="text" placeholder="CPR Nr" class="form-control ps-1" disabled
-                        @bind="PatientUser.Address">
-                </div>
-                <label class="form-label">Email</label>
-                <div class="input-group input-group-flat">
-                    <input type="text" placeholder="CPR Nr" class="form-control ps-1" disabled
-                        @bind="PatientUser.Email">
-                </div>
-
-
+                @if (CurrentStep == 1)
+                {
+                    <CreateJournalComp @bind-NextAvailable="NextAvailable"></CreateJournalComp>
+                }
+                <p>Opdateret i comp: @NextAvailable</p>
 
             </div>
         </div>
         <div class="row align-items-center mt-3">
             <div class="col-4">
                 <div class="progress">
-                    <div class="progress-bar" style="width: 25%" role="progressbar" aria-valuenow="25" aria-valuemin="0"
-                        aria-valuemax="100" aria-label="25% Complete">
-                        <span class="visually-hidden">25% Complete</span>
-                    </div>
+                    <div class="progress-bar" style='width: @(CurrentStep * 25)%'></div>
                 </div>
             </div>
             <div class="col">
@@ -74,7 +34,7 @@
                     <a class="btn btn-link link-secondary">
                         Gå tilbage
                     </a>
-                    <a class='btn btn-primary @(PatientFound ? "" : "disabled")'>
+                    <a @onclick="NextStep" class='btn btn-primary @(NextAvailable ? "" : "disabled")'>
                         Fortsæt
                     </a>
                 </div>
@@ -84,222 +44,24 @@
 </div>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="modal modal-blur fade" id="modal-newpatient" tabindex="-1" style="display: none;" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Ny medarbejder</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">CPR Nr</label>
-                            <input type="text" class="form-control" @bind="NewPatient.NormalizedUserName">
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Adresse</label>
-                            <input type="text" class="form-control" @bind="NewPatient.Address">
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Fornavn</label>
-                            <input type="text" class="form-control" @bind="NewPatient.Firstname">
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Efternavn</label>
-                            <input type="email" class="form-control" @bind="NewPatient.Lastname">
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Mobil nr</label>
-                            <input type="text" class="form-control" @bind="NewPatient.Mobilnr">
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" @bind="NewPatient.Email">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <a class="btn btn-link link-secondary" data-bs-dismiss="modal">
-                    Annuller
-                </a>
-                <a @onclick="CreateNewPatient" class="btn btn-primary ms-auto" data-bs-dismiss="modal">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
-                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    Opret patient
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
 @code {
-
-    //Steps variables
-    public string CPRnr { get; set; }
-    public ApplicationUser PatientUser { get; set; }
-    public ApplicationUser NewPatient { get; set; }
-    public bool PatientFound { get; set; }
-    public bool Loading { get; set; }
-
+    [Parameter]
+    public bool NextAvailable { get; set; }
+    public double CurrentStep { get; set; }
+    public double TotalSteps { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        PatientUser = new ApplicationUser();
-        NewPatient = new ApplicationUser();
-        //Default values. Role 3 is for patient and always confirm the email.
-        NewPatient.Role = 3;
-        NewPatient.EmailConfirmed = true;
-    }
-    public async void LookupPatient()
-    {
-        //Set loading to true to show a loading indicator
-        Loading = true;
-        //Try to find the user on the identity server
-        ApplicationUser res = await UserManager.FindByNameAsync(CPRnr.Replace("-", ""));
-        //If the user is found, mark it as found so the next button can be used
-        if (res != null)
-        {
-            PatientFound = true;
-            PatientUser = res;
-        }
-        else
-        {
-            //Disable the loading indicator
-            Loading = false;
-            StateHasChanged();
-
-            //Alert that the user couldn't be found and ask the user if they want to create it as a new patient
-            SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
-            {
-                Title = "Patient kunne ikke findes",
-                Html = string.Format("Vil du oprette det som en ny patient?"),
-                Icon = SweetAlertIcon.Error,
-                ShowCancelButton = true,
-                ConfirmButtonText = "Ja",
-                CancelButtonText = "Annuller"
-            });
-
-            if (!string.IsNullOrEmpty(result.Value))
-            {
-                try
-                {
-                    StateHasChanged();
-                    NewPatient.NormalizedUserName = CPRnr.Replace("-", "");
-                    //Show the create patient modal using javascript to show it.
-                    await JS.InvokeVoidAsync("journalNewPatient");
-                }
-                catch (System.Exception)
-                {
-                    await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen. (803)", "error");
-                }
-            }
-
-        }
-        //Disable loading indicator
-        Loading = false;
+        CurrentStep = 1;
+        TotalSteps = 4;
         StateHasChanged();
     }
 
-    //Create the new patient
-    public async void CreateNewPatient()
+    public void NextStep()
     {
-        try
-        {
-            //Copy the CPR number over in the username. This doesn't do anything really.
-            NewPatient.UserName = NewPatient.NormalizedUserName;
-            //Create the new patient on the identity server
-            await UserManager.CreateAsync(NewPatient);
-
-            //Alert that the new patient has been created and if the user wants to select it moving forward
-            SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
-            {
-                Title = "Patient er blevet tilføjet",
-                Html = string.Format("Vil du vælge denne patient til at fortsætte"),
-                Icon = SweetAlertIcon.Success,
-                ShowCancelButton = true,
-                ConfirmButtonText = "Ja",
-                CancelButtonText = "Nej"
-            });
-
-            if (!string.IsNullOrEmpty(result.Value))
-            {
-                try
-                {
-                    //Grab the newly created user from the identity server to get all fresh information, just in case.
-                    PatientUser = await UserManager.FindByNameAsync(NewPatient.NormalizedUserName);
-                    //Mark the patient as found to be able to use the next button
-                    PatientFound = true;
-                    StateHasChanged();
-                }
-                catch (System.Exception)
-                {
-                    //An error happend getting the new user from the identity server
-                    await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen. (801)", "error");
-                }
-            }
-
-
-
-        }
-        catch (System.Exception)
-        {
-            //An error happend creating the new user
-            await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen. (800)", "error");
-        }
+        CurrentStep += 1;
     }
-
-    //Format the CPR input field to make dashes like 123456-2012
-    public void CPRInput()
+    public void PrevStep()
     {
-        try
-        {
-            //Split the CPR up at the - and then split it up to be 12346-2012, so it's easier to read
-            string cpr = CPRnr.Replace("-", "");
-            string first = CPRnr.Substring(0, 6);
-            string second = CPRnr.Substring(6, 4);
-            CPRnr = first + "-" + second;
-        }
-        catch (System.Exception)
-        {
-        }
+        CurrentStep -= 1;
     }
-
-
 }
