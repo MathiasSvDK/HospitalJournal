@@ -18,7 +18,7 @@
                 <h1>Opret ny Journal</h1>
                 <p class="text-muted">Indtast patients informationer og vertificer det er den korrekte.</p>
             </div>
-            <div class="hr-text hr-text-center hr-text-spaceless">Patient</div>
+            <div class="hr-text hr-text-center hr-text-spaceless">Patient info</div>
 
             <div class="card-body">
                 <div class="mb-3">
@@ -46,6 +46,11 @@
                 <div class="input-group input-group-flat mb-2">
                     <input type="text" placeholder="CPR Nr" class="form-control ps-1" disabled
                         value='@(PatientUser.Firstname + " " + PatientUser.Lastname)'>
+                </div>
+                <label class="form-label">Adresse</label>
+                <div class="input-group input-group-flat">
+                    <input type="text" placeholder="CPR Nr" class="form-control ps-1" disabled
+                        @bind="PatientUser.Address">
                 </div>
                 <label class="form-label">Email</label>
                 <div class="input-group input-group-flat">
@@ -180,13 +185,17 @@
     {
         PatientUser = new ApplicationUser();
         NewPatient = new ApplicationUser();
+        //Default values. Role 3 is for patient and always confirm the email.
         NewPatient.Role = 3;
         NewPatient.EmailConfirmed = true;
     }
     public async void LookupPatient()
     {
+        //Set loading to true to show a loading indicator
         Loading = true;
-        ApplicationUser res = await UserManager.FindByNameAsync(CPRnr);
+        //Try to find the user on the identity server
+        ApplicationUser res = await UserManager.FindByNameAsync(CPRnr.Replace("-", ""));
+        //If the user is found, mark it as found so the next button can be used
         if (res != null)
         {
             PatientFound = true;
@@ -194,10 +203,11 @@
         }
         else
         {
+            //Disable the loading indicator
             Loading = false;
             StateHasChanged();
 
-
+            //Alert that the user couldn't be found and ask the user if they want to create it as a new patient
             SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
             {
                 Title = "Patient kunne ikke findes",
@@ -213,7 +223,8 @@
                 try
                 {
                     StateHasChanged();
-                    NewPatient.NormalizedUserName = CPRnr;
+                    NewPatient.NormalizedUserName = CPRnr.Replace("-", "");
+                    //Show the create patient modal using javascript to show it.
                     await JS.InvokeVoidAsync("journalNewPatient");
                 }
                 catch (System.Exception)
@@ -223,19 +234,22 @@
             }
 
         }
+        //Disable loading indicator
         Loading = false;
         StateHasChanged();
     }
 
-
+    //Create the new patient
     public async void CreateNewPatient()
     {
         try
         {
+            //Copy the CPR number over in the username. This doesn't do anything really.
             NewPatient.UserName = NewPatient.NormalizedUserName;
+            //Create the new patient on the identity server
             await UserManager.CreateAsync(NewPatient);
 
-
+            //Alert that the new patient has been created and if the user wants to select it moving forward
             SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
             {
                 Title = "Patient er blevet tilføjet",
@@ -250,30 +264,25 @@
             {
                 try
                 {
+                    //Grab the newly created user from the identity server to get all fresh information, just in case.
                     PatientUser = await UserManager.FindByNameAsync(NewPatient.NormalizedUserName);
+                    //Mark the patient as found to be able to use the next button
                     PatientFound = true;
                     StateHasChanged();
                 }
                 catch (System.Exception)
                 {
+                    //An error happend getting the new user from the identity server
                     await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen. (801)", "error");
                 }
             }
 
 
 
-
-
-
-
-
-
-
-
-
         }
         catch (System.Exception)
         {
+            //An error happend creating the new user
             await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen. (800)", "error");
         }
     }
@@ -283,6 +292,7 @@
     {
         try
         {
+            //Split the CPR up at the - and then split it up to be 12346-2012, so it's easier to read
             string cpr = CPRnr.Replace("-", "");
             string first = CPRnr.Substring(0, 6);
             string second = CPRnr.Substring(6, 4);
