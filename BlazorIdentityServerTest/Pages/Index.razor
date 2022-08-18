@@ -68,7 +68,7 @@
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        claims = user.Claims;
+            claims = user.Claims;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

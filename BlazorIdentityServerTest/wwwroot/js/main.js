@@ -147,3 +147,10 @@ function index() {
         },
     })).render();
 }
+
+
+
+function journalNewPatient() {
+    var myModal = new bootstrap.Modal(document.getElementById("modal-newpatient"), {});
+    myModal.show();
+}

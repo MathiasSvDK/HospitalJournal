@@ -29,6 +29,7 @@ namespace BlazorIdentityServerTest.Services
             _hospitalContext.Add(emp);
         }
 
+
         public void Save() {
             _hospitalContext.SaveChanges();
         }
@@ -56,6 +57,9 @@ namespace BlazorIdentityServerTest.Services
                 case 2:
                     return "Sygeplejerske";
                     break;
+                case 3:
+                    return "Patient";
+                    break;
                 default:
                     return "Fejl";
             }
@@ -73,6 +77,9 @@ namespace BlazorIdentityServerTest.Services
                     break;
                 case "2":
                     return "Sygeplejerske";
+                    break;
+                case "3":
+                    return "Patient";
                     break;
                 default:
                     return "Fejl";

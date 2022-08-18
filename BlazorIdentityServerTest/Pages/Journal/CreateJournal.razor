@@ -1,0 +1,297 @@
+@page "/Journal/Create"
+@using Microsoft.AspNetCore.Identity;
+@using System.Security.Claims
+@inject UserManager<ApplicationUser> UserManager;
+@inject SignInManager<ApplicationUser> _signinManager;
+@inject EmployeeService _employeeService
+@inject IJSRuntime JS
+
+<IsLoading Loading="@Loading"></IsLoading>
+
+
+
+<div class="page page-center" style="margin-top: -50px">
+    <div class="container-tight">
+        <div class="card card-md">
+            <div class="card-body text-center py-4 p-sm-5" style="padding-bottom: 30px !important;">
+                <img src="/img/care.svg" height="128" class="mb-n2" alt="">
+                <h1>Opret ny Journal</h1>
+                <p class="text-muted">Indtast patients informationer og vertificer det er den korrekte.</p>
+            </div>
+            <div class="hr-text hr-text-center hr-text-spaceless">Patient</div>
+
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">CPR NR</label>
+                    <div class="input-group input-group-flat">
+                        <input type="text" placeholder="CPR Nr" class="form-control ps-1" @bind="CPRnr"
+                            @bind:event="oninput" @onchange="CPRInput">
+                    </div>
+                    <div class="form-hint">
+                        Indtast CPR nr på patienten og klik vertificer.
+                    </div>
+                    <a class="mt-2 btn btn-primary d-block" @onclick="LookupPatient">
+                        Vertificer
+                    </a>
+                </div>
+
+
+
+                <label class="form-label">CPR NR</label>
+                <div class="input-group input-group-flat mb-2">
+                    <input type="text" placeholder="CPR Nr" class="form-control ps-1" disabled
+                        @bind="PatientUser.NormalizedUserName">
+                </div>
+                <label class="form-label">Navn</label>
+                <div class="input-group input-group-flat mb-2">
+                    <input type="text" placeholder="CPR Nr" class="form-control ps-1" disabled
+                        value='@(PatientUser.Firstname + " " + PatientUser.Lastname)'>
+                </div>
+                <label class="form-label">Email</label>
+                <div class="input-group input-group-flat">
+                    <input type="text" placeholder="CPR Nr" class="form-control ps-1" disabled
+                        @bind="PatientUser.Email">
+                </div>
+
+
+
+            </div>
+        </div>
+        <div class="row align-items-center mt-3">
+            <div class="col-4">
+                <div class="progress">
+                    <div class="progress-bar" style="width: 25%" role="progressbar" aria-valuenow="25" aria-valuemin="0"
+                        aria-valuemax="100" aria-label="25% Complete">
+                        <span class="visually-hidden">25% Complete</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="btn-list justify-content-end">
+                    <a class="btn btn-link link-secondary">
+                        Gå tilbage
+                    </a>
+                    <a class='btn btn-primary @(PatientFound ? "" : "disabled")'>
+                        Fortsæt
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="modal modal-blur fade" id="modal-newpatient" tabindex="-1" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ny medarbejder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label class="form-label">CPR Nr</label>
+                            <input type="text" class="form-control" @bind="NewPatient.NormalizedUserName">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label class="form-label">Adresse</label>
+                            <input type="text" class="form-control" @bind="NewPatient.Address">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label class="form-label">Fornavn</label>
+                            <input type="text" class="form-control" @bind="NewPatient.Firstname">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label class="form-label">Efternavn</label>
+                            <input type="email" class="form-control" @bind="NewPatient.Lastname">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label class="form-label">Mobil nr</label>
+                            <input type="text" class="form-control" @bind="NewPatient.Mobilnr">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" @bind="NewPatient.Email">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <a class="btn btn-link link-secondary" data-bs-dismiss="modal">
+                    Annuller
+                </a>
+                <a @onclick="CreateNewPatient" class="btn btn-primary ms-auto" data-bs-dismiss="modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Opret patient
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+
+    //Steps variables
+    public string CPRnr { get; set; }
+    public ApplicationUser PatientUser { get; set; }
+    public ApplicationUser NewPatient { get; set; }
+    public bool PatientFound { get; set; }
+    public bool Loading { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        PatientUser = new ApplicationUser();
+        NewPatient = new ApplicationUser();
+        NewPatient.Role = 3;
+        NewPatient.EmailConfirmed = true;
+    }
+    public async void LookupPatient()
+    {
+        Loading = true;
+        ApplicationUser res = await UserManager.FindByNameAsync(CPRnr);
+        if (res != null)
+        {
+            PatientFound = true;
+            PatientUser = res;
+        }
+        else
+        {
+            Loading = false;
+            StateHasChanged();
+
+
+            SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Patient kunne ikke findes",
+                Html = string.Format("Vil du oprette det som en ny patient?"),
+                Icon = SweetAlertIcon.Error,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Ja",
+                CancelButtonText = "Annuller"
+            });
+
+            if (!string.IsNullOrEmpty(result.Value))
+            {
+                try
+                {
+                    StateHasChanged();
+                    NewPatient.NormalizedUserName = CPRnr;
+                    await JS.InvokeVoidAsync("journalNewPatient");
+                }
+                catch (System.Exception)
+                {
+                    await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen. (803)", "error");
+                }
+            }
+
+        }
+        Loading = false;
+        StateHasChanged();
+    }
+
+
+    public async void CreateNewPatient()
+    {
+        try
+        {
+            NewPatient.UserName = NewPatient.NormalizedUserName;
+            await UserManager.CreateAsync(NewPatient);
+
+
+            SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Patient er blevet tilføjet",
+                Html = string.Format("Vil du vælge denne patient til at fortsætte"),
+                Icon = SweetAlertIcon.Success,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Ja",
+                CancelButtonText = "Nej"
+            });
+
+            if (!string.IsNullOrEmpty(result.Value))
+            {
+                try
+                {
+                    PatientUser = await UserManager.FindByNameAsync(NewPatient.NormalizedUserName);
+                    PatientFound = true;
+                    StateHasChanged();
+                }
+                catch (System.Exception)
+                {
+                    await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen. (801)", "error");
+                }
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+        }
+        catch (System.Exception)
+        {
+            await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen. (800)", "error");
+        }
+    }
+
+    //Format the CPR input field to make dashes like 123456-2012
+    public void CPRInput()
+    {
+        try
+        {
+            string cpr = CPRnr.Replace("-", "");
+            string first = CPRnr.Substring(0, 6);
+            string second = CPRnr.Substring(6, 4);
+            CPRnr = first + "-" + second;
+        }
+        catch (System.Exception)
+        {
+        }
+    }
+
+
+}
