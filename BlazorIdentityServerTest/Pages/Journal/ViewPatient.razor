@@ -1,6 +1,6 @@
 ﻿@page "/Journal/{PatientCPR:int}"
 @using Microsoft.AspNetCore.Identity
-@inject UserManager<ApplicationUser> UserManager
+@inject UserManager<ApplicationUser> _UserManager
 @inject JournalService _JournalService
 
 
@@ -39,18 +39,19 @@
                     </div>
                     @foreach (Journal journal in Journals)
                     {
+                        ApplicationUser employee = EmployeeList.Where(x => x.NormalizedUserName.ToString() == journal.AssignedEmployee.ToString()).FirstOrDefault();
                         <div class="card p-3">
                             <div class="row">
                                 <div class="col">
-                                    <b>erg</b>
+                                    <b>@journal.Date</b>
                                 </div>
                                 <div class="col">
                                     <div class="datagrid-item">
-                                        <div class="datagrid-title">Creator</div>
+                                        <div class="datagrid-title">Oprettet af</div>
                                         <div class="datagrid-content">
                                             <div class="d-flex align-items-center">
-                                                <span class="avatar avatar-xs me-2 avatar-rounded" style="background-image: url(./static/avatars/000m.jpg)"></span>
-                                                Paweł Kuna
+                                                <span class="avatar avatar-xs me-2 avatar-rounded" style="background-image: url(@employee.Pfp)"></span>
+                                                @employee.Firstname @employee.Lastname
                                             </div>
                                         </div>
                                     </div>
@@ -65,7 +66,6 @@
     </div>
 }
 
-
 @code {
 
     [Parameter]
@@ -73,10 +73,12 @@
 
     public ApplicationUser Patient { get; set; }
     public List<Journal> Journals { get; set; }
+    public List<ApplicationUser> EmployeeList { get; set; }
 
 
     protected override async Task OnInitializedAsync()
     {
+        EmployeeList = new List<ApplicationUser>();
     }
 
 
@@ -84,14 +86,20 @@
     {
         if (firstRender)
         {
-            Patient = await UserManager.FindByNameAsync(PatientCPR.ToString());
+            Patient = await _UserManager.FindByNameAsync(PatientCPR.ToString());
             if (Patient == null)
             {
                 await Swal.FireAsync("Fejl", "Denne patient kunne ikke findes", "error");
             }
             else
             {
-                Journals = _JournalService.GetByCPR(200);
+                Journals = _JournalService.GetByCPR(PatientCPR);
+                List<int> employees = Journals.Select(x => x.AssignedEmployee).ToList();
+                foreach (int cpr in employees)
+                {
+                    ApplicationUser user = await _UserManager.FindByNameAsync(cpr.ToString());
+                    EmployeeList.Add(user);
+                }
             }
             StateHasChanged();
         }

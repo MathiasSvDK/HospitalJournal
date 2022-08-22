@@ -1,0 +1,17 @@
+.form-selectgroup-item {
+    &:hover {
+        .attach-preview {
+            display: block;
+        }
+    }
+    .attach-preview {
+        display: none;
+        position: absolute;
+        top: 0;
+        right: -84px;
+        img {
+            width: 74px;
+            height: 74px;
+        }
+    }
+}

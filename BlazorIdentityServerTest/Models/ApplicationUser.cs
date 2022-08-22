@@ -17,5 +17,6 @@ namespace BlazorIdentityServerTest.Models
         public int Role { get; set; }
         public int HospitalId { get; set; }
         public string Email { get; set; }
+        public string Pfp { get; set; }
     }
 }
