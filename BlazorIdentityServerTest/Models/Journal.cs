@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlazorIdentityServerTest.Models
 {
     public partial class Journal
     {
         public int Id { get; set; }
-        public string? Attachments { get; set; }
-        public string? AssignedEmp { get; set; }
-        public string? AssignedPat { get; set; }
-        public int? Pages { get; set; }
+        public int? AssignedEmployee { get; set; }
+        public int? AssignedPatient { get; set; }
+        public string? Text { get; set; }
         public int? HospitalId { get; set; }
+        public string? Date { get; set; }
+        [NotMapped]
+        public List<Attachment> Attachments { get; set; }
     }
 }

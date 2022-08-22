@@ -41,16 +41,23 @@ namespace BlazorIdentityServerTest.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnType("int(11)")
-                    .ValueGeneratedNever()
                     .HasColumnName("id");
 
-                entity.Property(e => e.BlockId)
+                entity.Property(e => e.Filename)
                     .HasMaxLength(255)
-                    .HasColumnName("block_id");
+                    .HasColumnName("filename");
+
+                entity.Property(e => e.JournalId)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("journal_id");
 
                 entity.Property(e => e.Type)
                     .HasMaxLength(255)
                     .HasColumnName("type");
+
+                entity.Property(e => e.Uri)
+                    .HasMaxLength(255)
+                    .HasColumnName("uri");
             });
 
             modelBuilder.Entity<Journal>(entity =>
@@ -61,25 +68,25 @@ namespace BlazorIdentityServerTest.Models
                     .HasColumnType("int(11)")
                     .HasColumnName("id");
 
-                entity.Property(e => e.AssignedEmp)
-                    .HasMaxLength(255)
-                    .HasColumnName("assigned_emp");
+                entity.Property(e => e.AssignedEmployee)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("assigned_employee");
 
-                entity.Property(e => e.AssignedPat)
-                    .HasMaxLength(255)
-                    .HasColumnName("assigned_pat");
+                entity.Property(e => e.AssignedPatient)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("assigned_patient");
 
-                entity.Property(e => e.Attachments)
+                entity.Property(e => e.Date)
                     .HasMaxLength(255)
-                    .HasColumnName("attachments");
+                    .HasColumnName("date");
 
                 entity.Property(e => e.HospitalId)
                     .HasColumnType("int(11)")
                     .HasColumnName("hospital_id");
 
-                entity.Property(e => e.Pages)
-                    .HasColumnType("int(11)")
-                    .HasColumnName("pages");
+                entity.Property(e => e.Text)
+                    .HasMaxLength(500)
+                    .HasColumnName("text");
             });
 
             modelBuilder.Entity<JournalApprove>(entity =>

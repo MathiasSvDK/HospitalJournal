@@ -1,143 +1,113 @@
-@using Microsoft.AspNetCore.Identity;
-@inject UserManager<ApplicationUser> UserManager;
-@inject SignInManager<ApplicationUser> _signinManager;
-@inject EmployeeService _employeeService
-@inject IJSRuntime JS
+@using Contabo.ObjectStorage.S3
+@inject AttachmentService _attachmentService
 
 <IsLoading Loading="@Loading"></IsLoading>
 
 
+<div class="mb-3">
+    <div class="form-label">Journal tekst</div>
+    <textarea class="form-control" @bind="Journal.Text" rows="4"></textarea>
+</div>
+<div class="mb-3">
+    <div class="form-label">Vedhæft fil</div>
+    <InputFile accept="@("." + FileTypes.Aggregate((a,b) => a +", ."+ b))" OnChange="@LoadFiles" class="form-control" />
+    <p class="text-muted">Vedhæft må ikke fylde mere end 50 MB.</p>
+</div>
 
-                <div class="mb-3">
-                    <label class="form-label">CPR NR</label>
-                    <div class="input-group input-group-flat">
-                        <input type="text" placeholder="CPR Nr" class="form-control ps-1" @bind="CPRnr"
-                            @bind:event="oninput" @onchange="CPRInput">
+
+<div class="mb-3 mt-4">
+    <div class="row">
+        <span class="col form-label">Vedhæftet filer</span>
+
+        <span class='col-auto btn btn-danger @(journal.Attachments.Where(x => x.Delete == true).Count() > 0 ? "" :"disabled")'
+            @onclick="DeleteSelected" style="padding:3px 10px;margin-right:10px;margin-bottom:5px;margin-top:-5px">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash-x" width="24" height="24"
+                viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <path d="M4 7h16"></path>
+                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                <path d="M10 12l4 4m0 -4l-4 4"></path>
+            </svg>
+            Slet
+        </span>
+    </div>
+
+    <div class="form-selectgroup form-selectgroup-boxes d-flex flex-column">
+        @foreach (Attachment item in journal.Attachments)
+        {
+            <label class="form-selectgroup-item flex-fill">
+                <input type="checkbox" class="form-selectgroup-input" readonly checked="@item.Delete"
+                @oninput="() => item.Delete = !item.Delete">
+                <div class="form-selectgroup-label d-flex align-items-center p-3">
+                    <div class="me-3">
+                        <span class="form-selectgroup-check"></span>
                     </div>
-                    <div class="form-hint">
-                        Indtast CPR nr på patienten og klik vertificer.
-                    </div>
-                    <a class="mt-2 btn btn-primary d-block" @onclick="LookupPatient">
-                        Vertificer
-                    </a>
-                </div>
-
-
-
-                <label class="form-label">CPR NR</label>
-                <div class="input-group input-group-flat mb-2">
-                    <input type="text" class="form-control ps-1" disabled @bind="PatientUser.NormalizedUserName">
-                </div>
-                <label class="form-label">Navn</label>
-                <div class="input-group input-group-flat mb-2">
-                    <input type="text" class="form-control ps-1" disabled
-                        value='@(PatientUser.Firstname + " " + PatientUser.Lastname)'>
-                </div>
-                <label class="form-label">Adresse</label>
-                <div class="input-group input-group-flat">
-                    <input type="text" class="form-control ps-1" disabled @bind="PatientUser.Address">
-                </div>
-                <label class="form-label">Email</label>
-                <div class="input-group input-group-flat">
-                    <input type="text" class="form-control ps-1" disabled @bind="PatientUser.Email">
-                </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="modal modal-blur fade" id="modal-newpatient" tabindex="-1" style="display: none;" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Ny medarbejder</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">CPR Nr</label>
-                            <input type="text" class="form-control" @bind="NewPatient.NormalizedUserName">
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Adresse</label>
-                            <input type="text" class="form-control" @bind="NewPatient.Address">
+                    <div class="form-selectgroup-label-content d-flex align-items-center">
+                        <span class="avatar me-3">@item.Type</span>
+                        <div>
+                            <a href="@item.Uri" target="_blank" class="font-weight-medium">@item.Filename</a>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Fornavn</label>
-                            <input type="text" class="form-control" @bind="NewPatient.Firstname">
-                        </div>
+                @if (PreviewAllowed.Contains(item.Type))
+                {
+                    <div class="attach-preview">
+                        <img src="@item.Uri">
                     </div>
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Efternavn</label>
-                            <input type="email" class="form-control" @bind="NewPatient.Lastname">
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Mobil nr</label>
-                            <input type="text" class="form-control" @bind="NewPatient.Mobilnr">
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" @bind="NewPatient.Email">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <a class="btn btn-link link-secondary" data-bs-dismiss="modal">
-                    Annuller
-                </a>
-                <a @onclick="CreateNewPatient" class="btn btn-primary ms-auto" data-bs-dismiss="modal">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
-                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    Opret patient
-                </a>
-            </div>
-        </div>
+                }
+            </label>
+        }
     </div>
 </div>
 
 
 @code {
-
-    //Steps variables
-    public string CPRnr { get; set; }
-    public ApplicationUser PatientUser { get; set; }
-    public ApplicationUser NewPatient { get; set; }
+    public ContaboS3File S3File { get; set; }
     public bool Loading { get; set; }
+    public List<string> FileTypes { get; set; }
+    public List<string> PreviewAllowed { get; set; }
+
+    public async void DeleteSelected()
+    {
+        Journal.Attachments = journal.Attachments.Where(x => x.Delete == false).ToList();
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        NextAvailable = true;
+        FileTypes = new List<string>(){
+"png", "jpeg", "jpg", "zip", "pdf"
+};
+        PreviewAllowed = new List<string>()
+{
+"png", "jpeg", "jpg"
+};
 
 
+    }
+
+    public async void LoadFiles(InputFileChangeEventArgs e)
+    {
+        Loading = true;
+        try
+        {
+            Attachment newFile = await _attachmentService.UploadFile(e.File, e.File.Name, 1);
+            journal.Attachments.Add(newFile);
+            await InvokeAsync(() =>
+            {
+                Loading = false;
+                StateHasChanged();
+            });
+        }
+        catch (Exception)
+        {
+            Loading = false;
+            await Swal.FireAsync("Oops...", "Filen er for stor. Max størrelse er 50 MB", "error");
+        }
+    }
 
 
 
@@ -151,7 +121,8 @@
         get { return nextAvailable; }
         set
         {
-            if (nextAvailable != value) {
+            if (nextAvailable != value)
+            {
                 nextAvailable = value;
                 if (NextAvailableChanged.HasDelegate)
                 {
@@ -160,134 +131,29 @@
             }
         }
     }
-
     [Parameter]
     public EventCallback<bool> NextAvailableChanged { get; set; }
 
 
-    protected override async Task OnInitializedAsync()
-    {
-        PatientUser = new ApplicationUser();
-        NewPatient = new ApplicationUser();
-        //Default values. Role 3 is for patient and always confirm the email.
-        NewPatient.Role = 3;
-        NewPatient.EmailConfirmed = true;
-        CPRnr = "100";
-        LookupPatient();
-    }
-    public async void LookupPatient()
-    {
-        //Set loading to true to show a loading indicator
-        Loading = true;
-        //Try to find the user on the identity server
-        ApplicationUser res = await UserManager.FindByNameAsync(CPRnr.Replace("-", ""));
-        //If the user is found, mark it as found so the next button can be used
-        if (res != null)
-        {
-            NextAvailable = true;
-            PatientUser = res;
-        }
-        else
-        {
-            //Disable the loading indicator
-            Loading = false;
-            StateHasChanged();
 
-            //Alert that the user couldn't be found and ask the user if they want to create it as a new patient
-            SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
-            {
-                Title = "Patient kunne ikke findes",
-                Html = string.Format("Vil du oprette det som en ny patient?"),
-                Icon = SweetAlertIcon.Error,
-                ShowCancelButton = true,
-                ConfirmButtonText = "Ja",
-                CancelButtonText = "Annuller"
-            });
+    private Journal journal { get; set; }
 
-            if (!string.IsNullOrEmpty(result.Value))
+    [Parameter]
+    public Journal Journal
+    {
+        get { return journal; }
+        set
+        {
+            if (journal != value)
             {
-                try
+                journal = value;
+                if (JournalChanged.HasDelegate)
                 {
-                    StateHasChanged();
-                    NewPatient.NormalizedUserName = CPRnr.Replace("-", "");
-                    //Show the create patient modal using javascript to show it.
-                    await JS.InvokeVoidAsync("journalNewPatient");
-                }
-                catch (System.Exception)
-                {
-                    await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen. (803)", "error");
+                    JournalChanged.InvokeAsync(value);
                 }
             }
-
-        }
-        //Disable loading indicator
-        Loading = false;
-        StateHasChanged();
-    }
-
-    //Create the new patient
-    public async void CreateNewPatient()
-    {
-        try
-        {
-            //Copy the CPR number over in the username. This doesn't do anything really.
-            NewPatient.UserName = NewPatient.NormalizedUserName;
-            //Create the new patient on the identity server
-            await UserManager.CreateAsync(NewPatient);
-
-            //Alert that the new patient has been created and if the user wants to select it moving forward
-            SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
-            {
-                Title = "Patient er blevet tilføjet",
-                Html = string.Format("Vil du vælge denne patient til at fortsætte"),
-                Icon = SweetAlertIcon.Success,
-                ShowCancelButton = true,
-                ConfirmButtonText = "Ja",
-                CancelButtonText = "Nej"
-            });
-
-            if (!string.IsNullOrEmpty(result.Value))
-            {
-                try
-                {
-                    //Grab the newly created user from the identity server to get all fresh information, just in case.
-                    PatientUser = await UserManager.FindByNameAsync(NewPatient.NormalizedUserName);
-                    //Mark the patient as found to be able to use the next button
-                    NextAvailable = true;
-                    StateHasChanged();
-                }
-                catch (System.Exception)
-                {
-                    //An error happend getting the new user from the identity server
-                    await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen. (801)", "error");
-                }
-            }
-
-
-
-        }
-        catch (System.Exception)
-        {
-            //An error happend creating the new user
-            await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen. (800)", "error");
         }
     }
-
-    //Format the CPR input field to make dashes like 123456-2012
-    public void CPRInput()
-    {
-        try
-        {
-            //Split the CPR up at the - and then split it up to be 12346-2012, so it's easier to read
-            string cpr = CPRnr.Replace("-", "");
-            string first = CPRnr.Substring(0, 6);
-            string second = CPRnr.Substring(6, 4);
-            CPRnr = first + "-" + second;
-        }
-        catch (System.Exception)
-        {
-        }
-    }
-
-
+    [Parameter]
+    public EventCallback<Journal> JournalChanged { get; set; }
 }

@@ -13,7 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using BlazorIdentityServerTest.Services;
 using BlazorIdentityServerTest.Models;
 using CurrieTechnologies.Razor.SweetAlert2;
-
+using Contabo.ObjectStorage.S3;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,9 +24,21 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 
+
+var accessKey = "4f6ecc8ce7f94f0dba27ec2e834a9f01";
+var secretKey = "f1696f181d37c15b43fcb2676ecfc4ec";
+var s3TenantId = "67b15f74e4204ae2b25797487790bb79";
+var bucketName = "skole";
+
+ContaboS3Settings.Configure(accessKey, secretKey, s3TenantId, ContaboS3RegionEndpoint.EU2, bucketName);
+
+
+
 builder.Services.AddDefaultIdentity<ApplicationUser>()
     .AddSignInManager<CustomSignInManager>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
 
 
 builder.Services.AddRazorPages();
@@ -35,8 +47,10 @@ builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuth
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<EmployeeService>();
 builder.Services.AddScoped<HospitalService>();
+builder.Services.AddScoped<JournalService>();
 builder.Services.AddDbContext<HospitalContext>();
 builder.Services.AddDbContext<JournalContext>();
+builder.Services.AddScoped<AttachmentService>();
 builder.Services.AddSweetAlert2();
 
 

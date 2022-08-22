@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Contabo.ObjectStorage.S3" Version="1.0.3" />
     <PackageReference Include="CurrieTechnologies.Razor.SweetAlert2" Version="5.2.1" />
     <PackageReference Include="IdentityModel" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.5" />

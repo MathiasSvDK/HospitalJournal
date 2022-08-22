@@ -1,67 +1,113 @@
 @page "/Journal/Create"
-
-
-
+@inject JournalService _journalService
+@inject NavigationManager _navigationManager
+@inject AttachmentService _attachmentService
 
 
 <div class="page page-center" style="margin-top: -50px">
     <div class="container-tight">
         <div class="card card-md">
             <div class="card-body text-center py-4 p-sm-5" style="padding-bottom: 30px !important;">
-                <h1>Opret ny Journal</h1>
-                <p class="text-muted">Indtast patients informationer og vertificer det er den korrekte.</p>
-            </div>
-            <div class="hr-text hr-text-center hr-text-spaceless">Patient info</div>
-
-            <div class="card-body">
-
                 @if (CurrentStep == 1)
                 {
-                    <CreateJournalComp @bind-NextAvailable="NextAvailable"></CreateJournalComp>
+                    <h1>Opret ny Journal</h1>
+                    <p class="text-muted">Indtast patients informationer og vertificer det er den korrekte.</p>
+                    <div class="hr-text hr-text-center hr-text-spaceless mt-4">Patient info</div>
                 }
-                <p>Opdateret i comp: @NextAvailable</p>
+                @if (CurrentStep == 2)
+                {
+                    <h1>Indtast journal</h1>
+                    <p class="text-muted">Indtast journal og vedhæft evt. filer</p>
+                    <div class="hr-text hr-text-center hr-text-spaceless mt-4">Patient info</div>
+                }
+            </div>
 
+            <div class="card-body">
+                @if (CurrentStep == 1)
+                {
+                    <SelectPatientComp @bind-Journal="Journal" @bind-NextAvailable="NextAvailable"></SelectPatientComp>
+                }
+                @if (CurrentStep == 2)
+                {
+                    <CreateJournalComp @bind-Journal="Journal" @bind-NextAvailable="NextAvailable"></CreateJournalComp>
+                }
             </div>
         </div>
         <div class="row align-items-center mt-3">
             <div class="col-4">
                 <div class="progress">
-                    <div class="progress-bar" style='width: @(CurrentStep * 25)%'></div>
+                    <div class="progress-bar" style='width: @(CurrentStep * (100 / TotalSteps))%'></div>
                 </div>
             </div>
             <div class="col">
                 <div class="btn-list justify-content-end">
-                    <a class="btn btn-link link-secondary">
+                    <a class="btn btn-link link-secondary" @onclick="PrevStep">
                         Gå tilbage
                     </a>
-                    <a @onclick="NextStep" class='btn btn-primary @(NextAvailable ? "" : "disabled")'>
-                        Fortsæt
-                    </a>
+                    @if (CurrentStep >= 1 && CurrentStep < TotalSteps)
+                    {
+                        <a @onclick="NextStep" class='btn btn-primary @(NextAvailable ? "" : "disabled")'>
+                            <span>Fortsæt</span>
+                        </a>
+                    }
+                    @if (CurrentStep == TotalSteps)
+                    {
+                        <a @onclick="Create" class='btn btn-primary @(NextAvailable ? "" : "disabled")'>
+                            <span>Opret Journal</span>
+                        </a>
+                    }
                 </div>
             </div>
         </div>
     </div>
 </div>
-
+<p>Journal text: @Journal.Text</p>
+<p>Journal text: @Journal.Id</p>
 
 @code {
+
     [Parameter]
     public bool NextAvailable { get; set; }
+
+
+    [Parameter]
+    public Journal Journal { get; set; }
+
+
     public double CurrentStep { get; set; }
     public double TotalSteps { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
+        Journal = new Journal();
         CurrentStep = 1;
-        TotalSteps = 4;
+        TotalSteps = 3;
         StateHasChanged();
+    }
+
+    public async void Create()
+    {
+        Journal = await _journalService.CreateJournal(Journal);
+        await _journalService.SaveAsync();
+        foreach (Attachment att in Journal.Attachments)
+        {
+            att.JournalId = Journal.Id;
+            _attachmentService.Add(att);
+            await _attachmentService.SaveAsync();
+        }
+    //_NavigationManager.NavigateTo("Journal/"+Journal.Id);
     }
 
     public void NextStep()
     {
         CurrentStep += 1;
+        StateHasChanged();
     }
+
     public void PrevStep()
     {
         CurrentStep -= 1;
+        StateHasChanged();
     }
+
 }
