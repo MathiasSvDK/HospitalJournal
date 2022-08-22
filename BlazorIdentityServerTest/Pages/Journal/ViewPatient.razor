@@ -1,0 +1,100 @@
+﻿@page "/Journal/{PatientCPR:int}"
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject JournalService _JournalService
+
+
+<div class="container-xl">
+    <!-- Page title -->
+    <div class="page-header d-print-none">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <h2 class="page-title">
+                    Empty page
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@if (Patient != null)
+{
+    <div class="page-body">
+        <div class="container-xl">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Journal for @Patient.Firstname</h3>
+                        </div>
+                        <div class="card-body">Simple card</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Journaler</h3>
+                        </div>
+                    </div>
+                    @foreach (Journal journal in Journals)
+                    {
+                        <div class="card p-3">
+                            <div class="row">
+                                <div class="col">
+                                    <b>erg</b>
+                                </div>
+                                <div class="col">
+                                    <div class="datagrid-item">
+                                        <div class="datagrid-title">Creator</div>
+                                        <div class="datagrid-content">
+                                            <div class="d-flex align-items-center">
+                                                <span class="avatar avatar-xs me-2 avatar-rounded" style="background-image: url(./static/avatars/000m.jpg)"></span>
+                                                Paweł Kuna
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+
+    [Parameter]
+    public int PatientCPR { get; set; }
+
+    public ApplicationUser Patient { get; set; }
+    public List<Journal> Journals { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Patient = await UserManager.FindByNameAsync(PatientCPR.ToString());
+            if (Patient == null)
+            {
+                await Swal.FireAsync("Fejl", "Denne patient kunne ikke findes", "error");
+            }
+            else
+            {
+                Journals = _JournalService.GetByCPR(200);
+            }
+            StateHasChanged();
+        }
+    }
+
+}

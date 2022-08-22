@@ -1,0 +1,51 @@
+﻿@page "/xxxxxJournal/{journalId:int}"
+@inject JournalService _JournalService
+@inject AttachmentService _AttachmentService
+<h3>Journal</h3>
+
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Journal for </h3>
+        </div>
+        <div class="card-body">Simple card</div>
+    </div>
+</div>
+
+
+
+
+<p>@JournalId</p>
+<p>@Journal.Text</p>
+@foreach (Attachment att in Journal.Attachments)
+{
+    <p>@att.Uri</p>
+}
+
+@code {
+
+    [Parameter]
+    public int JournalId { get; set; }
+
+    public Journal Journal { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Journal = _JournalService.Get(JournalId);
+        if (Journal != null)
+        {
+            Journal.Attachments = _AttachmentService.GetAttachments(JournalId);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Journal == null)
+        {
+            await Swal.FireAsync("Fuldført", "Denne journal kunne ikke findes", "error");
+        }
+    }
+
+
+}
