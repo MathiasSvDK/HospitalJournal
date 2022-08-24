@@ -61,8 +61,6 @@
         </div>
     </div>
 </div>
-<p>Journal text: @Journal.Text</p>
-<p>Journal text: @Journal.Id</p>
 
 @code {
 
@@ -80,6 +78,7 @@
     protected override async Task OnInitializedAsync()
     {
         Journal = new Journal();
+        Journal.Attachments = new List<Attachment>();
         CurrentStep = 1;
         TotalSteps = 3;
         StateHasChanged();

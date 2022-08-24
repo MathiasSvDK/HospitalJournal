@@ -100,7 +100,7 @@ h1 {
   right: 10px;
   opacity: 0.7;
   color: #161616;
-  background: rgb(222, 222, 222);
+  background: #dedede;
   padding: 2px;
   border-radius: 50%;
   width: 25px;
@@ -126,6 +126,22 @@ h1 {
 .form-selectgroup-item .attach-preview img {
   width: 74px;
   height: 74px;
+}
+
+.patientview-info {
+  list-style: none;
+  margin-left: -15px;
+}
+.patientview .savechanges {
+  float: right;
+  display: block;
+}
+.patientview .card-header .card-title {
+  width: 100%;
+}
+.patientview .card-header .card-title a {
+  margin: 0 auto;
+  color: white !important;
 }
 
 /*# sourceMappingURL=site.css.map */

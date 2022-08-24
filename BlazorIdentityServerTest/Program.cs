@@ -50,6 +50,7 @@ builder.Services.AddScoped<HospitalService>();
 builder.Services.AddScoped<JournalService>();
 builder.Services.AddDbContext<HospitalContext>();
 builder.Services.AddDbContext<JournalContext>();
+builder.Services.AddDbContext<ApplicationDbContext>();
 builder.Services.AddScoped<AttachmentService>();
 builder.Services.AddSweetAlert2();
 

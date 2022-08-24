@@ -1,0 +1,19 @@
+.patientview {
+    &-info {
+        list-style: none;
+        margin-left: -15px;
+    }
+    .savechanges {
+        float: right;
+        display: block;
+    }
+    .card-header {
+        .card-title {
+            width: 100%;
+            a {
+                margin: 0 auto;
+                color: white !important;
+            }
+        }
+    }
+}
