@@ -12,6 +12,7 @@ namespace BlazorIdentityServerTest.Models
         public string? Text { get; set; }
         public int? HospitalId { get; set; }
         public DateTime Date { get; set; }
+        public string Note { get; set; }
         [NotMapped]
         public List<Attachment> Attachments { get; set; }
     }

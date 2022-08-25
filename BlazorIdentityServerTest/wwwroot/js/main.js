@@ -154,3 +154,10 @@ function journalNewPatient() {
     var myModal = new bootstrap.Modal(document.getElementById("modal-newpatient"), {});
     myModal.show();
 }
+
+
+
+function journalShowPending() {
+    var myModal = new bootstrap.Modal(document.getElementById("modal-showpending"), {});
+    myModal.show();
+}

@@ -27,7 +27,8 @@ namespace BlazorIdentityServerTest.Services
                 {
                     Type = file.Name.Split(".").Last().ToLower(),
                     Uri = upload.FileUrl,
-                    Filename = file.Name
+                    Filename = file.Name,
+                    JournalId = journalId
                 };
             }
             catch (System.Exception)
@@ -63,6 +64,10 @@ namespace BlazorIdentityServerTest.Services
         public List<Attachment> GetAttachments(int journalId)
         {
             return _journalContext.Attachments.Where(x => x.JournalId == journalId).ToList();
+        }
+        public List<Attachment> GetAttachments(List<int> attachmentIds)
+        {
+            return _journalContext.Attachments.Where(x => attachmentIds.Contains(x.Id)).ToList();
         }
     }
 }

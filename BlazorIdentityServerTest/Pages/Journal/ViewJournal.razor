@@ -1,50 +1,282 @@
-﻿@page "/xxxxxJournal/{journalId:int}"
-@inject JournalService _JournalService
-@inject AttachmentService _AttachmentService
-<h3>Journal</h3>
+@page "/Patient/{PatientCPR:int}/Journal/{JournalId:int}"
+@inject JournalService _journalService
+@inject AttachmentService _attachmentService
+@inject UserManager<ApplicationUser> _userManager
+@inject IJSRuntime JS
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
-
-<div class="container">
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Journal for </h3>
-        </div>
-        <div class="card-body">Simple card</div>
-    </div>
-</div>
-
-
-
-
-<p>@JournalId</p>
-<p>@Journal.Text</p>
-@foreach (Attachment att in Journal.Attachments)
+@if (Creator != null)
 {
-    <p>@att.Uri</p>
+    <div class="container-xl">
+        <!-- Page title -->
+        <div class="page-header d-print-none">
+            <div class="row g-2 align-items-center">
+                <div class="col">
+                    <h2 class="page-title">
+                        @Journal.AssignedPatient
+                    </h2>
+                    @if (User.Role == 0 && HasPending)
+                    {
+                        <div @onclick="ShowPending" class="btn btn-warning" style="float: right;">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hourglass-empty" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z"></path>
+                                <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z"></path>
+                            </svg>
+                            Godkendelse i kø
+                        </div>
+                    }
+                    @if (User.Role == 1 || User.Role == 2 || User.Role == 0)
+                    {
+                        <a href="/Patient/@PatientCPR/Journal/@Journal.Id/edit" data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip on top" class='btn btn-primary ' style="float: right;margin-right: 10px">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil-minus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M8 20l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4h4z"></path>
+                                <path d="M13.5 6.5l4 4"></path>
+                                <path d="M16 18h4"></path>
+                            </svg>
+                            Rediger Journal
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-body container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h3 class="card-title">Oprettet af @Creator.Firstname @Creator.Lastname</h3>
+                    </div>
+                    <div class="card-body">@Journal.Text</div>
+                </div>
+                <div class="form-selectgroup form-selectgroup-boxes d-flex flex-column">
+                    @foreach (Attachment att in Journal.Attachments)
+                    {
+                        <a href="@att.Uri" target="_blank" class="form-selectgroup-item flex-fill">
+                            <div class="form-selectgroup-label d-flex align-items-center p-3">
+                                <div class="form-selectgroup-label-content d-flex align-items-center">
+                                    <span class="avatar me-3">@att.Type</span>
+                                    <div>
+                                        <div class="font-weight-medium">@att.Filename</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Journal D. @Journal.Date</h3>
+                    </div>
+                    <div class="card-body">@Journal.Text</div>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
+
+@if (Approve != null)
+{
+    <div class="modal modal-blur fade" id="modal-showpending" tabindex="-1" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Journal ændringer som afventer godkendelse</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Denne journal er blevet ændret D. @Approve.Date af @ApproveEmployee.Firstname @ApproveEmployee.Lastname<br/><br/>
+
+                    <br/>
+                    @if (Approve.Note != "" && Approve.Note != null)
+                    {
+                        <label class="form-label">Note fra @ApproveEmployee.Firstname</label>
+                        <textarea class="disabled form-control" readonly>@Approve.Note</textarea>
+                        <br/>
+                        <br/>
+                    }
+
+                    <b>Ændringer som er foretaget:</b><br/><br/>
+                    @if (Approve.Text != Journal.Text)
+                    {
+                        <label class="mb-0 form-label">Tekst</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Fra</label>
+                                <textarea class="form-control disabled" readonly>@Journal.Text</textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Til</label>
+                                <textarea class="form-control disabled" readonly>@Approve.Text</textarea>
+                            </div>
+                        </div>
+                        <hr/>
+                    }
+                    @if (Approve.NewAttachmentsList != null)
+                    {
+                        <label class="mb-0 form-label">Nye vedhæftet filer:</label>
+                        <div class="row">
+                            @foreach (Attachment att in Approve.NewAttachmentsList)
+                            {
+                                <div class="col-md-6">
+                                    <a href="@att.Uri" target="_blank" class="form-selectgroup-item flex-fill" style="text-overflow: ellipsis">
+                                        <div class="form-selectgroup-label d-flex align-items-center p-3">
+                                            <div class="form-selectgroup-label-content  text-ellipsis d-flex align-items-center">
+                                                <span class="avatar me-3">@att.Type</span>
+                                                <div class="text-ellipsis">
+                                                    <div class="font-weight-medium text-ellipsis">@att.Filename</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @if (PreviewAllowed.Contains(att.Type))
+                                        {
+                                            <div class="attach-preview">
+                                                <img src="@att.Uri">
+                                            </div>
+                                        }
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <div class="modal-footer">
+                    <a class="btn btn-link link-secondary" data-bs-dismiss="modal">
+                        Annuller
+                    </a>
+                    <a @onclick="DenyChanges" class="btn btn-danger ms-auto" data-bs-dismiss="modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        Afvis ændring
+                    </a>
+                    <a @onclick="ApproveChanges" class="btn btn-success" data-bs-dismiss="modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M5 12l5 5l10 -10"></path>
+                        </svg>
+                        Godkend ændring
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
 @code {
+
+    [Parameter]
+    public int PatientCPR { get; set; }
 
     [Parameter]
     public int JournalId { get; set; }
 
     public Journal Journal { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    public JournalApprove Approve { get; set; }
+    public ApplicationUser ApproveEmployee { get; set; }
+    public List<string> PreviewAllowed { get; set; }
+
+
+    public ApplicationUser Creator { get; set; }
+    public bool HasPending { get; set; }
+
+    public ApplicationUser User { get; set; }
+
+
+
+
+    public async void ApproveChanges()
     {
-        Journal = _JournalService.Get(JournalId);
-        if (Journal != null)
-        {
-            Journal.Attachments = _AttachmentService.GetAttachments(JournalId);
-        }
+        _journalService.ApproveChanges(Approve);
+        await _journalService.SaveAsync();
+        Journal = _journalService.Get(JournalId);
+        HasPending = _journalService.HasPending(JournalId);
+        Journal.Attachments = _attachmentService.GetAttachments(JournalId);
+        StateHasChanged();
     }
+
+    
+    public async void DenyChanges()
+    {
+        _journalService.Denychanges(Approve.Id);
+        await _journalService.SaveAsync();
+        HasPending = false;
+        StateHasChanged();
+    }
+    
+    
+    
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (Journal == null)
+        if (firstRender)
         {
-            await Swal.FireAsync("Fuldført", "Denne journal kunne ikke findes", "error");
+            AuthenticationState user = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            User = await _userManager.GetUserAsync(user.User);
+
+            Journal = _journalService.Get(JournalId);
+            HasPending = _journalService.HasPending(JournalId);
+
+
+            PreviewAllowed = new List<string>()
+            {
+                "png", "jpeg", "jpg"
+            };
+
+
+            if (HasPending)
+            {
+                Approve = _journalService.GetJournalPending(JournalId);
+                ApproveEmployee = await _userManager.FindByNameAsync(Approve.EditorId.ToString());
+
+
+                List<int> attIds = new List<int>();
+                try
+                {
+                    attIds = Approve.NewAttachments.Split(",").Select(x => Convert.ToInt32(x)).ToList();
+                }
+                catch (Exception e)
+                {
+                    attIds.Add(Convert.ToInt32(Approve.NewAttachments));
+                }
+
+
+                Approve.NewAttachmentsList = _attachmentService.GetAttachments(attIds);
+            }
+            if (Journal != null)
+            {
+                Journal.Attachments = _attachmentService.GetAttachments(JournalId);
+                Creator = await _userManager.FindByNameAsync(Journal.AssignedEmployee.ToString());
+            }
+
+            StateHasChanged();
+            if (Journal == null)
+            {
+                await Swal.FireAsync("Fuldført", "Der skete en fejl (241)", "error");
+            }
+            if (Creator == null)
+            {
+                await Swal.FireAsync("Fuldført", "Der skete en fejl (581)", "error");
+            }
         }
+    }
+
+
+    public async void ShowPending()
+    {
+        await JS.InvokeVoidAsync("journalShowPending");
     }
 
 

@@ -28,4 +28,10 @@
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\Journal\CreateJournal.razor" />
+    <_ContentIncludedByDefault Remove="Pages\Journal\EditJournal.razor" />
+    <_ContentIncludedByDefault Remove="Pages\Journal\ViewPatient.razor" />
+  </ItemGroup>
+
 </Project>

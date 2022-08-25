@@ -1,0 +1,306 @@
+@page "/Patient/{PatientCPR:int}/Journal/{JournalId:int}/edit"
+@inject JournalService _journalService
+@inject AttachmentService _attachmentService
+@inject UserManager<ApplicationUser> _userManager
+@inject NavigationManager _navMan
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<IsLoading Loading="@Loading"></IsLoading>
+
+@if (Creator != null)
+{
+    <div class="container-xl">
+        <!-- Page title -->
+        <div class="page-header d-print-none">
+            <div class="row g-2 align-items-center">
+                <div class="col">
+                    <h2 class="page-title">
+                        @Journal.AssignedPatient
+                    </h2>
+                    <div @onclick="SaveChanges" class="btn btn-success" style="float: right;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M5 12l5 5l10 -10"></path>
+                        </svg>
+                        Gem ændringer
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-body container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Vedhæft filer</h3>
+                    </div>
+                    <div class="card-body">
+                        <InputFile accept="@("." + FileTypes.Aggregate((a, b) => a + ", ." + b))" OnChange="@LoadFiles" class="form-control mb-1"/>
+
+                        <span class='mt-2 w-100 btn btn-danger @(NewAttachments.Where(x => x.Delete == true).Count() > 0 ? "" : "disabled")'
+                              @onclick="DeleteSelected" style="padding:3px 10px;margin-right:10px;margin-bottom:5px;margin-top:-5px">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash-x" width="24" height="24"
+                                 viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                                 stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M4 7h16"></path>
+                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                                <path d="M10 12l4 4m0 -4l-4 4"></path>
+                            </svg>
+                            Slet
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card mt-3" style="position: relative;z-index:999;">
+                    <div class="card-body form-selectgroup form-selectgroup-boxes d-flex flex-column mt-3">
+
+                        @foreach (Attachment item in NewAttachments)
+                        {
+                            <label class="form-selectgroup-item flex-fill">
+                                <input type="checkbox" class="form-selectgroup-input" readonly checked="@item.Delete"
+                                       @oninput="() => item.Delete = !item.Delete">
+                                <div class="form-selectgroup-label text-e d-flex align-items-center p-3">
+                                    <div class="me-3">
+                                        <span class="form-selectgroup-check"></span>
+                                    </div>
+                                    <div class="form-selectgroup-label-content text-ellipsis d-flex align-items-center">
+                                        <span class="avatar me-3">@item.Type</span>
+                                        <div class="text-ellipsis">
+                                            <a href="@item.Uri" target="_blank" class="text-ellipsis font-weight-medium">
+                                                <span class="badge">Ny</span> @item.Filename
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                @if (PreviewAllowed.Contains(item.Type))
+                                {
+                                    <div class="attach-preview">
+                                        <img src="@item.Uri">
+                                    </div>
+                                }
+                            </label>
+                        }
+
+
+                        @foreach (Attachment att in Journal.Attachments)
+                        {
+                            <a href="@att.Uri" target="_blank" class="form-selectgroup-item flex-fill">
+                                <div class="form-selectgroup-label d-flex align-items-center p-3">
+                                    <div class="form-selectgroup-label-content text-ellipsis d-flex align-items-center">
+                                        <span class="avatar me-3">@att.Type</span>
+                                        <div class="text-ellipsis">
+                                            <div class="font-weight-medium text-ellipsis">@att.Filename</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @if (PreviewAllowed.Contains(att.Type))
+                                {
+                                    <div class="attach-preview">
+                                        <img src="@att.Uri">
+                                    </div>
+                                }
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Redigere Journal D. @Journal.Date</h3>
+                    </div>
+                    <div class="card-body">
+                        <label class="form-label">Journal tekst</label>
+                        <textarea class="form-control" rows="4" @bind="Journal.Text"></textarea>
+                        <br/>
+                        <label class="form-label">Note</label>
+                        <textarea class="form-control" rows="4" @bind="Journal.Note"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public int PatientCPR { get; set; }
+
+    [Parameter]
+    public int JournalId { get; set; }
+
+    public Journal Journal { get; set; }
+
+
+    public ApplicationUser Creator { get; set; }
+
+
+    public List<string> FileTypes { get; set; }
+    public List<string> PreviewAllowed { get; set; }
+
+
+    public List<Attachment> NewAttachments { get; set; }
+    public bool Loading { get; set; }
+    
+    public ApplicationUser User { get; set; }
+
+    public async void DeleteSelected()
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+        {
+            Title = "Er du sikker?",
+            Html = string.Format(string.Format("Vil du slette de markeret <b>{0}</b> vedhæftet filer?", NewAttachments.Where(x => x.Delete == true).Count())),
+            Icon = SweetAlertIcon.Warning,
+            ShowCancelButton = true,
+            ConfirmButtonText = "Ja, slet",
+            CancelButtonText = "Nej"
+        });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            try
+            {
+                NewAttachments = NewAttachments.Where(x => x.Delete == false).ToList();
+                await Swal.FireAsync("Fuldført", "Ændringerne er blevet sendt til godkendelse", "success");
+                StateHasChanged();
+            }
+            catch (System.Exception)
+            {
+                await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen. (803)", "error");
+            }
+        }
+        StateHasChanged();
+    }
+
+
+    public async void SaveChanges()
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+        {
+            Title = "Er du sikker?",
+            Html = string.Format("Vil du foretage disse ændringer og sende dem til godkendelse?"),
+            Icon = SweetAlertIcon.Warning,
+            ShowCancelButton = true,
+            ConfirmButtonText = "Ja",
+            CancelButtonText = "Nej"
+        });
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            try
+            {
+                Loading = true;
+                foreach (Attachment att in NewAttachments)
+                {
+                    _attachmentService.Add(att);
+                    await _attachmentService.SaveAsync();
+                }
+                await _journalService.CreateRequest(Journal, NewAttachments, Convert.ToInt32(User.NormalizedUserName));
+                await _journalService.SaveAsync();
+
+                Loading = false;
+
+                await Swal.FireAsync("Fuldført", "Ændringerne er blevet sendt til godkendelse", "success");
+
+                StateHasChanged();
+            }
+            catch (System.Exception)
+            {
+                await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen. (801)", "error");
+            }
+        }
+    }
+
+
+    public async void LoadFiles(InputFileChangeEventArgs e)
+    {
+        Loading = true;
+        try
+        {
+            Attachment newFile = await _attachmentService.UploadFile(e.File, e.File.Name, 0);
+            NewAttachments.Add(newFile);
+            await InvokeAsync(() =>
+            {
+                Loading = false;
+                StateHasChanged();
+            });
+        }
+        catch (Exception)
+        {
+            Loading = false;
+            await Swal.FireAsync("Oops...", "Filen er for stor. Max størrelse er 50 MB", "error");
+        }
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            
+            
+            AuthenticationState user = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            User = await _userManager.GetUserAsync(user.User);
+            
+            
+    //Check if the journal already has a pending change. If it does, then alert the user
+            bool hasPending = _journalService.HasPending(JournalId);
+            if (hasPending == false)
+            {
+                NewAttachments = new List<Attachment>();
+                FileTypes = new List<string>()
+                {
+                    "png", "jpeg", "jpg", "zip", "pdf"
+                };
+                PreviewAllowed = new List<string>()
+                {
+                    "png", "jpeg", "jpg"
+                };
+
+
+                Journal = _journalService.Get(JournalId);
+                if (Journal != null)
+                {
+                    Journal.Attachments = _attachmentService.GetAttachments(JournalId);
+                    Creator = await _userManager.FindByNameAsync(Journal.AssignedEmployee.ToString());
+                }
+
+                StateHasChanged();
+                if (Journal == null)
+                {
+                    await Swal.FireAsync("Fejl", "Der skete en fejl (241)", "error");
+                }
+                if (Creator == null)
+                {
+                    await Swal.FireAsync("Fejl", "Der skete en fejl (581)", "error");
+                }
+            }
+            else
+            {
+                SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Fejl",
+                    Html = string.Format("Denne journal har allerede en ændring som afventer godkendelse.<br>Hvor vil du navigere til?"),
+                    Icon = SweetAlertIcon.Error,
+                    ShowCancelButton = true,
+                    ConfirmButtonText = "Til journal",
+                    CancelButtonText = "Forside"
+                });
+                if (!string.IsNullOrEmpty(result.Value))
+                {
+                    _navMan.NavigateTo(string.Format("/Patient/{0}/Journal/{1}", PatientCPR, JournalId));
+                }
+                else
+                {
+                    _navMan.NavigateTo("/");
+                }
+            }
+        }
+    }
+
+
+}

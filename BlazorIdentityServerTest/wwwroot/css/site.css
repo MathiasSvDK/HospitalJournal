@@ -94,6 +94,30 @@ h1 {
     transform: rotate(360deg);
   }
 }
+.uploadbtn {
+  background: #f2f3f4;
+  height: 50px;
+}
+
+.form-selectgroup-item {
+  width: 100%;
+  word-break: break-all;
+}
+
+.text-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal {
+  z-index: 1590897978359414783;
+}
+
+.modal-content {
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+
 .employee-fire {
   position: absolute;
   top: 10px;

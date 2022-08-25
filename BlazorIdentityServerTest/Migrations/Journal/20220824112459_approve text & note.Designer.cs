@@ -3,6 +3,7 @@ using System;
 using BlazorIdentityServerTest.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorIdentityServerTest.Migrations.Journal
 {
     [DbContext(typeof(JournalContext))]
-    partial class JournalContextModelSnapshot : ModelSnapshot
+    [Migration("20220824112459_approve text & note")]
+    partial class approvetextnote
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,10 +79,6 @@ namespace BlazorIdentityServerTest.Migrations.Journal
                         .HasColumnType("int(11)")
                         .HasColumnName("hospital_id");
 
-                    b.Property<string>("Note")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<string>("Text")
                         .HasMaxLength(500)
                         .HasColumnType("varchar(500)")
@@ -97,9 +95,6 @@ namespace BlazorIdentityServerTest.Migrations.Journal
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int(11)")
                         .HasColumnName("id");
-
-                    b.Property<bool>("Approved")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime>("Date")
                         .HasMaxLength(255)
@@ -121,6 +116,7 @@ namespace BlazorIdentityServerTest.Migrations.Journal
                         .HasColumnName("newattachments");
 
                     b.Property<string>("Note")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int?>("OwnerId")

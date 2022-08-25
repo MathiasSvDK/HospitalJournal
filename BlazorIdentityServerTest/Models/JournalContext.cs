@@ -105,9 +105,16 @@ namespace BlazorIdentityServerTest.Models
                     .HasColumnType("int(11)")
                     .HasColumnName("owner_id");
 
-                entity.Property(e => e.PageId)
+                entity.Property(e => e.JournalId)
                     .HasColumnType("int(11)")
-                    .HasColumnName("page_id");
+                    .HasColumnName("journal_id");
+                
+                entity.Property(e => e.NewAttachments)
+                    .HasMaxLength(255)
+                    .HasColumnName("newattachments");
+                entity.Property(e => e.Date)
+                    .HasMaxLength(255)
+                    .HasColumnName("date");
             });
 
             modelBuilder.Entity<Page>(entity =>

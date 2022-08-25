@@ -3,6 +3,7 @@ using System;
 using BlazorIdentityServerTest.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorIdentityServerTest.Migrations.Journal
 {
     [DbContext(typeof(JournalContext))]
-    partial class JournalContextModelSnapshot : ModelSnapshot
+    [Migration("20220825085320_Journal Note allow null")]
+    partial class JournalNoteallownull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -97,9 +99,6 @@ namespace BlazorIdentityServerTest.Migrations.Journal
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int(11)")
                         .HasColumnName("id");
-
-                    b.Property<bool>("Approved")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime>("Date")
                         .HasMaxLength(255)
