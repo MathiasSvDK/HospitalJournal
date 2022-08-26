@@ -1,27 +1,27 @@
-﻿@page "/Journal/{PatientCPR:int}"
+﻿@page "/Patient/{PatientCPR:int}"
 @using Microsoft.AspNetCore.Identity
 @using BlazorIdentityServerTest.Data
 @using Microsoft.AspNetCore.Identity.EntityFrameworkCore
 @inject UserManager<ApplicationUser> _UserManager
 @inject JournalService _JournalService
 
-
-<div class="container-xl">
-    <!-- Page title -->
-    <div class="page-header d-print-none">
-        <div class="row g-2 align-items-center">
-            <div class="col">
-                <h2 class="page-title">
-                    Empty page
-                </h2>
-            </div>
-        </div>
-    </div>
-</div>
+<IsLoading Loading="@Loading"></IsLoading>
 
 
 @if (Patient != null)
 {
+    <div class="container-xl">
+        <!-- Page title -->
+        <div class="page-header d-print-none">
+            <div class="row g-2 align-items-center">
+                <div class="col">
+                    <h2 class="page-title">
+                        Journal for @Patient.Firstname @Patient.Lastname
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="page-body patientview">
         <div class="container-xl">
             <div class="row">
@@ -125,7 +125,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-1">
-                                    <a href="#" class="btn btn-flickr w-100 btn-icon" aria-label="Facebook">
+                                    <a href="/Patient/@PatientCPR/Journal/@journal.Id" class="btn btn-flickr w-100 btn-icon" aria-label="Facebook">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -152,6 +152,7 @@
     public ApplicationUser Patient { get; set; }
     public List<Journal> Journals { get; set; }
     public List<ApplicationUser> EmployeeList { get; set; }
+    public bool Loading { get; set; }
 
 
     protected override async Task OnInitializedAsync()
@@ -179,6 +180,8 @@
     {
         if (firstRender)
         {
+            Loading = true;
+            StateHasChanged();
             Patient = await _UserManager.FindByNameAsync(PatientCPR.ToString());
             if (Patient == null)
             {
@@ -194,6 +197,7 @@
                     EmployeeList.Add(user);
                 }
             }
+            Loading = false;
             StateHasChanged();
         }
     }

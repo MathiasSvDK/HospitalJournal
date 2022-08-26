@@ -4,11 +4,11 @@
 @inject UserManager<ApplicationUser> _userManager
 @inject IJSRuntime JS
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject HospitalService _hospitalService
 
 @if (Creator != null)
 {
     <div class="container-xl">
-        <!-- Page title -->
         <div class="page-header d-print-none">
             <div class="row g-2 align-items-center">
                 <div class="col">
@@ -26,6 +26,7 @@
                             Godkendelse i kø
                         </div>
                     }
+                    <!--TODO: Fjern user.role == 0 når det skal fremvises-->
                     @if (User.Role == 1 || User.Role == 2 || User.Role == 0)
                     {
                         <a href="/Patient/@PatientCPR/Journal/@Journal.Id/edit" data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip on top" class='btn btn-primary ' style="float: right;margin-right: 10px">
@@ -38,11 +39,25 @@
                             Rediger Journal
                         </a>
                     }
+                    @if (User.Role == 0)
+                    {
+                        <a @onclick="ShowMoveJournal" data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip on top" class='btn btn-secondary ' style="float: right;margin-right: 10px">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-packge-import" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M12 21l-8 -4.5v-9l8 -4.5l8 4.5v4.5"></path>
+                                <path d="M12 12l8 -4.5"></path>
+                                <path d="M12 12v9"></path>
+                                <path d="M12 12l-8 -4.5"></path>
+                                <path d="M22 18h-7"></path>
+                                <path d="M18 15l-3 3l3 3"></path>
+                            </svg>
+                            Flyt Journal
+                        </a>
+                    }
                 </div>
             </div>
         </div>
     </div>
-
     <div class="page-body container">
         <div class="row">
             <div class="col-md-4">
@@ -78,6 +93,9 @@
         </div>
     </div>
 }
+
+
+
 
 
 @if (Approve != null)
@@ -145,7 +163,6 @@
                         </div>
                     }
                 </div>
-
                 <div class="modal-footer">
                     <a class="btn btn-link link-secondary" data-bs-dismiss="modal">
                         Annuller
@@ -173,6 +190,44 @@
 
 
 
+@if (Hospitals != null)
+{
+    <div class="modal modal-blur fade" id="modal-movejournal" tabindex="-1" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Flyt Journal til andet Hospital</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Du er igang med at flytte denne Journal til et andet hospital.<br/>
+                    Vælg hvilket hospital, som den skal flyttes til.
+
+                    <label class="form-label mt-3">Hospital</label>
+                    <select @bind="SelectedHospital" class="form-control">
+                        @foreach (Hospital item in Hospitals)
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-link link-secondary" data-bs-dismiss="modal">
+                        Annuller
+                    </a>
+                    <a @onclick="ConfirmMove" class="btn btn-success" data-bs-dismiss="modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M5 12l5 5l10 -10"></path>
+                        </svg>
+                        Godkend overførsel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
 
     [Parameter]
@@ -181,20 +236,18 @@
     [Parameter]
     public int JournalId { get; set; }
 
-    public Journal Journal { get; set; }
+    #region Journal Variables
 
     public JournalApprove Approve { get; set; }
     public ApplicationUser ApproveEmployee { get; set; }
     public List<string> PreviewAllowed { get; set; }
-
-
     public ApplicationUser Creator { get; set; }
     public bool HasPending { get; set; }
+    public Journal Journal { get; set; }
 
-    public ApplicationUser User { get; set; }
+    #endregion
 
-
-
+    #region Journal functions
 
     public async void ApproveChanges()
     {
@@ -206,7 +259,7 @@
         StateHasChanged();
     }
 
-    
+
     public async void DenyChanges()
     {
         _journalService.Denychanges(Approve.Id);
@@ -214,9 +267,47 @@
         HasPending = false;
         StateHasChanged();
     }
-    
-    
-    
+
+    #endregion
+
+    public ApplicationUser User { get; set; }
+
+    #region Move journal variables
+
+    public int SelectedHospital { get; set; }
+    public List<Hospital> Hospitals { get; set; }
+
+    #endregion
+
+    public async void ConfirmMove()
+    {
+        Hospital newHospital = _hospitalService.Get(SelectedHospital);
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+        {
+            Title = "Er du sikker?",
+            Html = string.Format("Når Journalen er overført til <b>{0}</b>, kan den kun retuneres ved at de overføre den tilbage.", newHospital.Name),
+            Icon = SweetAlertIcon.Warning,
+            ShowCancelButton = true,
+            ConfirmButtonText = "Ja, overfør",
+            CancelButtonText = "Annuller"
+        });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            try
+            {
+                //Move the journal
+                _journalService.MoveJournal(JournalId, SelectedHospital);
+                await _journalService.SaveAsync();
+                await Swal.FireAsync("Fuldført", "Journalen er blevet overført.", "success");
+                StateHasChanged();
+            }
+            catch (System.Exception e)
+            {
+                await Swal.FireAsync("Oops...", "Der skete en fejl (782)", "error");
+            }
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -225,21 +316,22 @@
             AuthenticationState user = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             User = await _userManager.GetUserAsync(user.User);
 
+            Hospitals = _hospitalService.Get().Where(x => x.Id != User.HospitalId).ToList();
+            SelectedHospital = Hospitals.First().Id;
+            StateHasChanged();
+
             Journal = _journalService.Get(JournalId);
             HasPending = _journalService.HasPending(JournalId);
-
 
             PreviewAllowed = new List<string>()
             {
                 "png", "jpeg", "jpg"
             };
 
-
             if (HasPending)
             {
                 Approve = _journalService.GetJournalPending(JournalId);
                 ApproveEmployee = await _userManager.FindByNameAsync(Approve.EditorId.ToString());
-
 
                 List<int> attIds = new List<int>();
                 try
@@ -259,24 +351,31 @@
                 Journal.Attachments = _attachmentService.GetAttachments(JournalId);
                 Creator = await _userManager.FindByNameAsync(Journal.AssignedEmployee.ToString());
             }
+            else
+            {
+                await Swal.FireAsync("Fejl", "Der skete en fejl (241)", "error");
+            }
 
             StateHasChanged();
-            if (Journal == null)
-            {
-                await Swal.FireAsync("Fuldført", "Der skete en fejl (241)", "error");
-            }
             if (Creator == null)
             {
-                await Swal.FireAsync("Fuldført", "Der skete en fejl (581)", "error");
+                await Swal.FireAsync("Fejl", "Der skete en fejl (581)", "error");
             }
         }
     }
 
+    #region Show modal functions
 
     public async void ShowPending()
     {
         await JS.InvokeVoidAsync("journalShowPending");
     }
 
+    public async void ShowMoveJournal()
+    {
+        await JS.InvokeVoidAsync("journalMoveJournal");
+    }
+
+    #endregion
 
 }

@@ -161,3 +161,9 @@ function journalShowPending() {
     var myModal = new bootstrap.Modal(document.getElementById("modal-showpending"), {});
     myModal.show();
 }
+
+
+function journalMoveJournal() {
+    var myModal = new bootstrap.Modal(document.getElementById("modal-movejournal"), {});
+    myModal.show();
+}

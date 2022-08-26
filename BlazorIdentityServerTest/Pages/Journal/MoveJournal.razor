@@ -1,0 +1,78 @@
+@page "/Patient/{PatientCPR:int}/Journal/{JournalId:int}/move"
+@inject HospitalService _hospitalService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> _userManager
+
+
+@if (User != null)
+{
+    <div class="page page-center">
+        <div class="container-tight py-4">
+            <div class="card card-md">
+                <div class="card-body text-center py-4 p-sm-5">
+                    <h1>Flyt journal</h1>
+                    <p class="text-muted">Flyt journal til andet Hospital.</p>
+                    <div class="hr-text hr-text-center hr-text-spaceless mt-4">Patient info</div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Vælg hospital</label>
+                        <select class="form-select mb-0" @bind="SelectedHospital">
+                            @foreach (Hospital item in Hospitals)
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row align-items-center mt-3">
+                <div class="col-4">
+                </div>
+                <div class="col">
+                    <div class="btn-list justify-content-end">
+                        <a href="#" class="btn btn-link link-secondary">
+                            Gå tilbage til Journal
+                        </a>
+                        <a href="#" class="btn btn-primary">
+                            Flyt Journal
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+
+
+@code {
+
+    [Parameter]
+    public int PatientCPR { get; set; }
+
+    [Parameter]
+    public int JournalId { get; set; }
+
+    public List<Hospital> Hospitals { get; set; }
+    public string SelectedHospital { get; set; }
+    public ApplicationUser User { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Get the current signed in user ApplicationUser
+        AuthenticationState user = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        User = await _userManager.GetUserAsync(user.User);
+        //Get all hospitals
+        Hospitals = _hospitalService.Get().Where(x => x.Id != User.HospitalId).ToList();
+        //Default select the first one
+        SelectedHospital = Hospitals.First().Id.ToString();
+    }
+
+    public void ConfirmMove()
+    {
+    }
+
+}

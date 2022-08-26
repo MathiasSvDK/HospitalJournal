@@ -32,6 +32,7 @@
     <_ContentIncludedByDefault Remove="Pages\Journal\CreateJournal.razor" />
     <_ContentIncludedByDefault Remove="Pages\Journal\EditJournal.razor" />
     <_ContentIncludedByDefault Remove="Pages\Journal\ViewPatient.razor" />
+    <_ContentIncludedByDefault Remove="Pages\Journal\ViewJournal.razor" />
   </ItemGroup>
 
 </Project>

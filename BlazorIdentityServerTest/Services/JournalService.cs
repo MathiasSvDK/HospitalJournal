@@ -73,7 +73,12 @@ namespace BlazorIdentityServerTest.Services
         {
             return _journalContext.JournalApproves.Any(x => x.JournalId == journalId && x.Approved == 0);
         }
-        
+
+
+        public void MoveJournal(int journalId, int hospitalId)
+        {
+            _journalContext.Journals.Where(x => x.Id == hospitalId).First().HospitalId = hospitalId;
+        }
         
         
         public Journal Get(int journalId)

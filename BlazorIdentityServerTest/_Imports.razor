@@ -16,3 +16,6 @@
 @using Microsoft.AspNetCore.Identity
 @inject SweetAlertService Swal
 @using BlazorIdentityServerTest.Components.Journal
+@inject UserManager<ApplicationUser> _userManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+}
