@@ -3,6 +3,7 @@ using System;
 using BlazorIdentityServerTest.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorIdentityServerTest.Migrations.Journal
 {
     [DbContext(typeof(JournalContext))]
-    partial class JournalContextModelSnapshot : ModelSnapshot
+    [Migration("20220826103038_Added lournallogs")]
+    partial class Addedlournallogs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -141,9 +143,6 @@ namespace BlazorIdentityServerTest.Migrations.Journal
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");

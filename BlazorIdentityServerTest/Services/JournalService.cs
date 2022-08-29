@@ -77,7 +77,7 @@ namespace BlazorIdentityServerTest.Services
 
         public void MoveJournal(int journalId, int hospitalId)
         {
-            _journalContext.Journals.Where(x => x.Id == hospitalId).First().HospitalId = hospitalId;
+            _journalContext.Journals.Where(x => x.Id == journalId).First().HospitalId = hospitalId;
         }
         
         

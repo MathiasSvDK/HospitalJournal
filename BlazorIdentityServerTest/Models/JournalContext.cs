@@ -20,12 +20,13 @@ namespace BlazorIdentityServerTest.Models
         public virtual DbSet<Journal> Journals { get; set; } = null!;
         public virtual DbSet<JournalApprove> JournalApproves { get; set; } = null!;
         public virtual DbSet<Page> Pages { get; set; } = null!;
+        public virtual DbSet<JournalLog> JournalLogs { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                //TODO: Do so this is in appsettings instead
                 optionsBuilder.UseMySql("server=116.203.36.14;database=journal;user=root;password=Sejkode123!", Microsoft.EntityFrameworkCore.ServerVersion.Parse("10.3.34-mariadb"));
             }
         }

@@ -2,6 +2,7 @@
 @inject JournalService _journalService
 @inject AttachmentService _attachmentService
 @inject UserManager<ApplicationUser> _userManager
+@inject LogsService _logsService
 @inject IJSRuntime JS
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HospitalService _hospitalService
@@ -237,18 +238,15 @@
     public int JournalId { get; set; }
 
     #region Journal Variables
-
     public JournalApprove Approve { get; set; }
     public ApplicationUser ApproveEmployee { get; set; }
     public List<string> PreviewAllowed { get; set; }
     public ApplicationUser Creator { get; set; }
     public bool HasPending { get; set; }
     public Journal Journal { get; set; }
-
     #endregion
 
     #region Journal functions
-
     public async void ApproveChanges()
     {
         _journalService.ApproveChanges(Approve);
@@ -267,16 +265,13 @@
         HasPending = false;
         StateHasChanged();
     }
-
     #endregion
 
     public ApplicationUser User { get; set; }
 
     #region Move journal variables
-
     public int SelectedHospital { get; set; }
     public List<Hospital> Hospitals { get; set; }
-
     #endregion
 
     public async void ConfirmMove()
@@ -299,7 +294,9 @@
                 //Move the journal
                 _journalService.MoveJournal(JournalId, SelectedHospital);
                 await _journalService.SaveAsync();
+                _logsService.Insert(JournalId, User.NormalizedUserName, string.Format("Journal er blevet flyttet fra {0} til {1}", "ee", "ggg"));
                 await Swal.FireAsync("Fuldført", "Journalen er blevet overført.", "success");
+                //TODO: Make so it refreshes the hospitals
                 StateHasChanged();
             }
             catch (System.Exception e)
@@ -315,24 +312,31 @@
         {
             AuthenticationState user = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             User = await _userManager.GetUserAsync(user.User);
-
+            
+            //Get the hospitals for the move modal
             Hospitals = _hospitalService.Get().Where(x => x.Id != User.HospitalId).ToList();
             SelectedHospital = Hospitals.First().Id;
-            StateHasChanged();
-
+            
+            //Get the journal
             Journal = _journalService.Get(JournalId);
+            //Check if the Journal has any pending changes.
             HasPending = _journalService.HasPending(JournalId);
 
+                //Define what image types that are allowed to be previewed
             PreviewAllowed = new List<string>()
             {
                 "png", "jpeg", "jpg"
             };
 
+            //If it has any pending changes
             if (HasPending)
             {
+                //Get the pending Jornal Change
                 Approve = _journalService.GetJournalPending(JournalId);
+                //Get the employee object
                 ApproveEmployee = await _userManager.FindByNameAsync(Approve.EditorId.ToString());
 
+                //MariaDB doesn't allow lists, so we have to split it up by comma.
                 List<int> attIds = new List<int>();
                 try
                 {
@@ -343,9 +347,10 @@
                     attIds.Add(Convert.ToInt32(Approve.NewAttachments));
                 }
 
-
+                
                 Approve.NewAttachmentsList = _attachmentService.GetAttachments(attIds);
             }
+            //The journal is found. Get the attachments
             if (Journal != null)
             {
                 Journal.Attachments = _attachmentService.GetAttachments(JournalId);

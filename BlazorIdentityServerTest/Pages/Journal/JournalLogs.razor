@@ -1,0 +1,80 @@
+@page "/Patient/{PatientCPR:int}/Journal/{JournalId:int}/logs"
+@inject LogsService _logsService
+@inject UserManager<ApplicationUser> _userManager
+
+<div class="page-body">
+    <div class="container-xl">
+        <div class="row justify-content-center">
+            <div class="col-8">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="divide-y">
+                            @foreach (JournalLog log in Logs.OrderByDescending(x => x.Date))
+                            {
+                                <div>
+                                    <div class="row">
+                                        <div class="col-auto">
+                                            @if (log.Employee != null)
+                                            {
+                                                if (log.Employee.Pfp != null || log.Employee.Pfp != "")
+                                                {
+                                                    <span class="avatar" style="background-image: url(@log.Employee.Pfp)"></span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="avatar">@log.Employee.Firstname.Substring(0, 1)@log.Employee.Lastname.Substring(0, 1)</span>
+                                                }
+                                            }
+                                        </div>
+                                        <div class="col">
+                                            <div class="text-truncate">
+                                                @if (log.Employee != null)
+                                                {
+                                                    <strong style="margin-right:5px;">@log.Employee.Firstname @log.Employee.Lastname</strong> @log.Text
+                                                }
+                                            </div>
+                                            <div class="text-muted">@log.Date</div>
+                                        </div>
+                                        <div class="col-auto align-self-center">
+                                            <div class="badge bg-primary"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public int PatientCPR { get; set; }
+
+    [Parameter]
+    public int JournalId { get; set; }
+    public List<JournalLog> Logs { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        
+        //TODO: Gør så "EmployeeId" er "EmployeeCPR" da det ikke er deres id men deres CPR man søger på ligesom ved normale brugere.
+        Logs = _logsService.Get(JournalId);
+        List<int> usersIds = new List<int>();
+        usersIds = Logs.Select(x => x.EmployeeId).Distinct().ToList();
+
+        List<ApplicationUser> users = new List<ApplicationUser>();
+        foreach (int id in usersIds)
+        {
+            users.Add(await _userManager.FindByNameAsync(id.ToString()));
+        }
+        
+        Logs.ForEach(x => x.Employee = users.Where(a => a.NormalizedUserName == x.EmployeeId.ToString()).First());
+
+
+    }
+
+}
