@@ -16,20 +16,20 @@
                     <h2 class="page-title">
                         @Journal.AssignedPatient
                     </h2>
-                    @if (User.Role == 0 && HasPending)
-                    {
-                        <div @onclick="ShowPending" class="btn btn-warning" style="float: right;">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hourglass-empty" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z"></path>
-                                <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z"></path>
-                            </svg>
-                            Godkendelse i kø
-                        </div>
-                    }
-                    <!--TODO: Fjern user.role == 0 når det skal fremvises-->
-                    @if (User.Role == 1 || User.Role == 2 || User.Role == 0)
-                    {
+                    <AuthorizeView Roles="0">
+                        @if (HasPending)
+                        {
+                            <div @onclick="ShowPending" class="btn btn-warning" style="float: right;">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hourglass-empty" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z"></path>
+                                    <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z"></path>
+                                </svg>
+                                Godkendelse i kø
+                            </div>
+                        }
+                    </AuthorizeView>
+                    <AuthorizeView Roles="1,2">
                         <a href="/Patient/@PatientCPR/Journal/@Journal.Id/edit" data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip on top" class='btn btn-primary ' style="float: right;margin-right: 10px">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil-minus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -39,9 +39,8 @@
                             </svg>
                             Rediger Journal
                         </a>
-                    }
-                    @if (User.Role == 0)
-                    {
+                    </AuthorizeView>
+                    <AuthorizeView Roles="0">
                         <a @onclick="ShowMoveJournal" data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip on top" class='btn btn-secondary ' style="float: right;margin-right: 10px">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-packge-import" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -54,7 +53,7 @@
                             </svg>
                             Flyt Journal
                         </a>
-                    }
+                    </AuthorizeView>
                 </div>
             </div>
         </div>
@@ -238,15 +237,18 @@
     public int JournalId { get; set; }
 
     #region Journal Variables
+
     public JournalApprove Approve { get; set; }
     public ApplicationUser ApproveEmployee { get; set; }
     public List<string> PreviewAllowed { get; set; }
     public ApplicationUser Creator { get; set; }
     public bool HasPending { get; set; }
     public Journal Journal { get; set; }
+
     #endregion
 
     #region Journal functions
+
     public async void ApproveChanges()
     {
         _journalService.ApproveChanges(Approve);
@@ -265,13 +267,16 @@
         HasPending = false;
         StateHasChanged();
     }
+
     #endregion
 
     public ApplicationUser User { get; set; }
 
     #region Move journal variables
+
     public int SelectedHospital { get; set; }
     public List<Hospital> Hospitals { get; set; }
+
     #endregion
 
     public async void ConfirmMove()
@@ -291,12 +296,12 @@
         {
             try
             {
-                //Move the journal
+    //Move the journal
                 _journalService.MoveJournal(JournalId, SelectedHospital);
                 await _journalService.SaveAsync();
                 _logsService.Insert(JournalId, User.NormalizedUserName, string.Format("Journal er blevet flyttet fra {0} til {1}", "ee", "ggg"));
                 await Swal.FireAsync("Fuldført", "Journalen er blevet overført.", "success");
-                //TODO: Make so it refreshes the hospitals
+    //TODO: Make so it refreshes the hospitals
                 StateHasChanged();
             }
             catch (System.Exception e)
@@ -312,31 +317,31 @@
         {
             AuthenticationState user = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             User = await _userManager.GetUserAsync(user.User);
-            
-            //Get the hospitals for the move modal
+
+    //Get the hospitals for the move modal
             Hospitals = _hospitalService.Get().Where(x => x.Id != User.HospitalId).ToList();
             SelectedHospital = Hospitals.First().Id;
-            
-            //Get the journal
+
+    //Get the journal
             Journal = _journalService.Get(JournalId);
-            //Check if the Journal has any pending changes.
+    //Check if the Journal has any pending changes.
             HasPending = _journalService.HasPending(JournalId);
 
-                //Define what image types that are allowed to be previewed
+    //Define what image types that are allowed to be previewed
             PreviewAllowed = new List<string>()
             {
                 "png", "jpeg", "jpg"
             };
 
-            //If it has any pending changes
+    //If it has any pending changes
             if (HasPending)
             {
-                //Get the pending Jornal Change
+    //Get the pending Jornal Change
                 Approve = _journalService.GetJournalPending(JournalId);
-                //Get the employee object
+    //Get the employee object
                 ApproveEmployee = await _userManager.FindByNameAsync(Approve.EditorId.ToString());
 
-                //MariaDB doesn't allow lists, so we have to split it up by comma.
+    //MariaDB doesn't allow lists, so we have to split it up by comma.
                 List<int> attIds = new List<int>();
                 try
                 {
@@ -347,10 +352,10 @@
                     attIds.Add(Convert.ToInt32(Approve.NewAttachments));
                 }
 
-                
+
                 Approve.NewAttachmentsList = _attachmentService.GetAttachments(attIds);
             }
-            //The journal is found. Get the attachments
+    //The journal is found. Get the attachments
             if (Journal != null)
             {
                 Journal.Attachments = _attachmentService.GetAttachments(JournalId);
