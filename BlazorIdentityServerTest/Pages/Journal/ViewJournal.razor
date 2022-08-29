@@ -15,44 +15,48 @@
                     <h2 class="page-title">
                         @Journal.AssignedPatient
                     </h2>
-                    <AuthorizeView Roles="0">
-                        @if (HasPending)
-                        {
-                            <div @onclick="ShowPending" class="btn btn-warning" style="float: right;">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hourglass-empty" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                    <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z"></path>
-                                    <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z"></path>
-                                </svg>
-                                Godkendelse i kø
-                            </div>
-                        }
-                    </AuthorizeView>
-                    <AuthorizeView Roles="1,2">
-                        <a href="/Patient/@PatientCPR/Journal/@Journal.Id/edit" data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip on top" class='btn btn-primary ' style="float: right;margin-right: 10px">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil-minus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    @if (HasPending)
+                    {
+                        <div @onclick="ShowPending" class="btn btn-warning" style="float: right;">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hourglass-empty" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                <path d="M8 20l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4h4z"></path>
-                                <path d="M13.5 6.5l4 4"></path>
-                                <path d="M16 18h4"></path>
+                                <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z"></path>
+                                <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z"></path>
                             </svg>
-                            Rediger Journal
-                        </a>
-                    </AuthorizeView>
-                    <AuthorizeView Roles="0">
-                        <a @onclick="ShowMoveJournal" data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip on top" class='btn btn-secondary ' style="float: right;margin-right: 10px">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-packge-import" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                <path d="M12 21l-8 -4.5v-9l8 -4.5l8 4.5v4.5"></path>
-                                <path d="M12 12l8 -4.5"></path>
-                                <path d="M12 12v9"></path>
-                                <path d="M12 12l-8 -4.5"></path>
-                                <path d="M22 18h-7"></path>
-                                <path d="M18 15l-3 3l3 3"></path>
-                            </svg>
-                            Flyt Journal
-                        </a>
-                    </AuthorizeView>
+                            Godkendelse i kø
+                        </div>
+                    }
+                    <a href="/Patient/@PatientCPR/Journal/@Journal.Id/edit" data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip on top" class='btn btn-primary ' style="float: right;margin-right: 10px">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil-minus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M8 20l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4h4z"></path>
+                            <path d="M13.5 6.5l4 4"></path>
+                            <path d="M16 18h4"></path>
+                        </svg>
+                        Rediger Journal
+                    </a>
+                    <a @onclick="ShowMoveJournal" data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip on top" class='btn btn-secondary ' style="float: right;margin-right: 10px">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-packge-import" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M12 21l-8 -4.5v-9l8 -4.5l8 4.5v4.5"></path>
+                            <path d="M12 12l8 -4.5"></path>
+                            <path d="M12 12v9"></path>
+                            <path d="M12 12l-8 -4.5"></path>
+                            <path d="M22 18h-7"></path>
+                            <path d="M18 15l-3 3l3 3"></path>
+                        </svg>
+                        Flyt Journal
+                    </a>
+                    <a href="/Patient/@PatientCPR/Journal/@Journal.Id/logs" class='btn btn-info ' style="float: right;margin-right: 10px">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-article" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                            <path d="M7 8h10"></path>
+                            <path d="M7 12h10"></path>
+                            <path d="M7 16h10"></path>
+                        </svg>
+                        Se logs
+                    </a>
                 </div>
             </div>
         </div>

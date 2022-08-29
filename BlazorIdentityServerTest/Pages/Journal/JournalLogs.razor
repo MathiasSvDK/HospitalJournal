@@ -4,7 +4,35 @@
 
 <div class="page-body">
     <div class="container-xl">
+
+
         <div class="row justify-content-center">
+
+            <div class="col-8">
+                <div class="page-header d-print-none mb-2">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <h2 class="page-title">
+                                Journal logs
+                            </h2>
+                        </div>
+                        <!-- Page title actions -->
+                        <div class="col-12 col-md-auto ms-auto d-print-none">
+                            <div class="d-flex">
+                                <a href="/Patient/@PatientCPR/Journal/@JournalId" class="btn btn-primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        <line x1="5" y1="12" x2="11" y2="18"></line>
+                                        <line x1="5" y1="12" x2="11" y2="6"></line>
+                                    </svg>
+                                    Gå tilbage til Journal
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="col-8">
                 <div class="card">
                     <div class="card-body">
@@ -30,7 +58,8 @@
                                             <div class="text-truncate">
                                                 @if (log.Employee != null)
                                                 {
-                                                    <strong style="margin-right:5px;">@log.Employee.Firstname @log.Employee.Lastname</strong> @log.Text
+                                                    <strong style="margin-right:5px;">@log.Employee.Firstname @log.Employee.Lastname</strong>
+                                                    @log.Text
                                                 }
                                             </div>
                                             <div class="text-muted">@log.Date</div>
@@ -57,11 +86,12 @@
 
     [Parameter]
     public int JournalId { get; set; }
+
     public List<JournalLog> Logs { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        
-        //TODO: Gør så "EmployeeId" er "EmployeeCPR" da det ikke er deres id men deres CPR man søger på ligesom ved normale brugere.
+    //TODO: Gør så "EmployeeId" er "EmployeeCPR" da det ikke er deres id men deres CPR man søger på ligesom ved normale brugere.
         Logs = _logsService.Get(JournalId);
         List<int> usersIds = new List<int>();
         usersIds = Logs.Select(x => x.EmployeeId).Distinct().ToList();
@@ -71,10 +101,8 @@
         {
             users.Add(await _userManager.FindByNameAsync(id.ToString()));
         }
-        
+
         Logs.ForEach(x => x.Employee = users.Where(a => a.NormalizedUserName == x.EmployeeId.ToString()).First());
-
-
     }
 
 }
