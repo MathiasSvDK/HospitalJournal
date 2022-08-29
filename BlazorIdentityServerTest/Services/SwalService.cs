@@ -16,7 +16,11 @@ public class SwalService
     }
     public async Task Warning(string text)
     {
-        await Swal.FireAsync("Oops...", text, "warning");
+        await Swal.FireAsync("Advarsel", text, "warning");
+    }
+    public async Task Success(string text)
+    {
+        await Swal.FireAsync("Fuldført", text, "success");
     }
     
     

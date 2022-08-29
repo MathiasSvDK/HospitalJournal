@@ -145,7 +145,7 @@
 
     public List<Attachment> NewAttachments { get; set; }
     public bool Loading { get; set; }
-    
+
     public ApplicationUser User { get; set; }
 
     public async void DeleteSelected()
@@ -179,16 +179,8 @@
 
     public async void SaveChanges()
     {
-        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
-        {
-            Title = "Er du sikker?",
-            Html = string.Format("Vil du foretage disse ændringer og sende dem til godkendelse?"),
-            Icon = SweetAlertIcon.Warning,
-            ShowCancelButton = true,
-            ConfirmButtonText = "Ja",
-            CancelButtonText = "Nej"
-        });
-        if (!string.IsNullOrEmpty(result.Value))
+        bool ask = await _swalService.Ask("Er du sikker?", "Vil du foretage disse ændringer og sende dem til godkendelse?", "Ja", "Nej");
+        if (ask)
         {
             try
             {
@@ -203,16 +195,17 @@
 
                 Loading = false;
 
-                await Swal.FireAsync("Fuldført", "Ændringerne er blevet sendt til godkendelse", "success");
-
-                StateHasChanged();
+                await _swalService.Success("Ændringerne er blevet sendt til godkendelse");
             }
-            catch (System.Exception)
+            catch (Exception e)
             {
-                await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen. (801)", "error");
+                await _swalService.Error("Det skete en fejl. Prøv igen. (801)");
             }
+
+            StateHasChanged();
         }
     }
+    
 
 
     public async void LoadFiles(InputFileChangeEventArgs e)
@@ -231,7 +224,7 @@
         catch (Exception)
         {
             Loading = false;
-            await Swal.FireAsync("Oops...", "Filen er for stor. Max størrelse er 50 MB", "error");
+            await _swalService.Error("Filen er for stor. Max størrelse er 50 MB");
         }
     }
 
@@ -240,21 +233,21 @@
     {
         if (firstRender)
         {
-            
-            
             AuthenticationState user = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             User = await _userManager.GetUserAsync(user.User);
-            
-            
+
+
     //Check if the journal already has a pending change. If it does, then alert the user
             bool hasPending = _journalService.HasPending(JournalId);
             if (hasPending == false)
             {
                 NewAttachments = new List<Attachment>();
+                //File types that are allowed to be uploaded
                 FileTypes = new List<string>()
                 {
                     "png", "jpeg", "jpg", "zip", "pdf"
                 };
+                //File types that are allowed to be previewed
                 PreviewAllowed = new List<string>()
                 {
                     "png", "jpeg", "jpg"
@@ -271,25 +264,17 @@
                 StateHasChanged();
                 if (Journal == null)
                 {
-                    await Swal.FireAsync("Fejl", "Der skete en fejl (241)", "error");
+                    await _swalService.Error("Det skete en fejl (241)");
                 }
                 if (Creator == null)
                 {
-                    await Swal.FireAsync("Fejl", "Der skete en fejl (581)", "error");
+                    await _swalService.Error("Det skete en fejl (581)");
                 }
             }
             else
             {
-                SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
-                {
-                    Title = "Fejl",
-                    Html = string.Format("Denne journal har allerede en ændring som afventer godkendelse.<br>Hvor vil du navigere til?"),
-                    Icon = SweetAlertIcon.Error,
-                    ShowCancelButton = true,
-                    ConfirmButtonText = "Til journal",
-                    CancelButtonText = "Forside"
-                });
-                if (!string.IsNullOrEmpty(result.Value))
+                bool ask = await _swalService.Ask("Fejl", string.Format("Denne journal har allerede en ændring som afventer godkendelse.<br>Hvor vil du navigere til?"), "Til journal", "Forside");
+                if (ask)
                 {
                     _navMan.NavigateTo(string.Format("/Patient/{0}/Journal/{1}", PatientCPR, JournalId));
                 }

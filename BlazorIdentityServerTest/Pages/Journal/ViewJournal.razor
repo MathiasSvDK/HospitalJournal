@@ -1,7 +1,6 @@
 @page "/Patient/{PatientCPR:int}/Journal/{JournalId:int}"
 @inject JournalService _journalService
 @inject AttachmentService _attachmentService
-@inject UserManager<ApplicationUser> _userManager
 @inject LogsService _logsService
 @inject IJSRuntime JS
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -282,31 +281,23 @@
     public async void ConfirmMove()
     {
         Hospital newHospital = _hospitalService.Get(SelectedHospital);
-        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
-        {
-            Title = "Er du sikker?",
-            Html = string.Format("Når Journalen er overført til <b>{0}</b>, kan den kun retuneres ved at de overføre den tilbage.", newHospital.Name),
-            Icon = SweetAlertIcon.Warning,
-            ShowCancelButton = true,
-            ConfirmButtonText = "Ja, overfør",
-            CancelButtonText = "Annuller"
-        });
 
-        if (!string.IsNullOrEmpty(result.Value))
+    //Ask the user if they are sure they want to move the Journal
+        bool ask = await _swalService.Ask("Er du sikker?", string.Format("Når Journalen er overført til <b>{0}</b>, kan den kun retuneres ved at de overføre den tilbage.", newHospital.Name), "Ja, overfør", "Annuller");
+        if (ask)
         {
             try
             {
-    //Move the journal
                 _journalService.MoveJournal(JournalId, SelectedHospital);
                 await _journalService.SaveAsync();
                 _logsService.Insert(JournalId, User.NormalizedUserName, string.Format("Journal er blevet flyttet fra {0} til {1}", "ee", "ggg"));
-                await Swal.FireAsync("Fuldført", "Journalen er blevet overført.", "success");
+                await _swalService.Success("Journalen er blevet overført");
     //TODO: Make so it refreshes the hospitals
                 StateHasChanged();
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                await Swal.FireAsync("Oops...", "Der skete en fejl (782)", "error");
+                await _swalService.Error("Det skete en fejl (452)");
             }
         }
     }
@@ -363,13 +354,13 @@
             }
             else
             {
-                await Swal.FireAsync("Fejl", "Der skete en fejl (241)", "error");
+                await _swalService.Error("Det skete en fejl (431)");
             }
 
             StateHasChanged();
             if (Creator == null)
             {
-                await Swal.FireAsync("Fejl", "Der skete en fejl (581)", "error");
+                await _swalService.Error("Det skete en fejl (581)");
             }
         }
     }
