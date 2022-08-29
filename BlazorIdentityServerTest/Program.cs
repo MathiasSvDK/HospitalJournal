@@ -48,6 +48,7 @@ builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<EmployeeService>();
 builder.Services.AddScoped<HospitalService>();
 builder.Services.AddScoped<JournalService>();
+builder.Services.AddScoped<SwalService>();
 builder.Services.AddScoped<LogsService>();
 builder.Services.AddDbContext<HospitalContext>();
 builder.Services.AddDbContext<JournalContext>();

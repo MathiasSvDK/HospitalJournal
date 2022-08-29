@@ -1,6 +1,7 @@
 @page "/Patient/Search"
 @inject UserManager<ApplicationUser> _userManager
 @inject NavigationManager _navMan
+@inject SwalService _swalService
 
 
 <div class="page page-center">
@@ -44,16 +45,21 @@
 
     public async void Search()
     {
-        ApplicationUser user = await _userManager.FindByNameAsync(SearchCPR);
-        if (user != null)
+        if (SearchCPR == null || SearchCPR == "")
         {
-            _navMan.NavigateTo("/Patient/"+SearchCPR);
+            await _swalService.Warning("Du skal indtaste et CPR nr");
         }
         else
         {
-            await Swal.FireAsync("Oops...", "Patient med dette CPR kunne ikke findes.", "error");
+            ApplicationUser user = await _userManager.FindByNameAsync(SearchCPR);
+            if (user != null)
+            {
+                _navMan.NavigateTo("/Patient/"+SearchCPR);
+            }
+            else
+            {
+                await _swalService.Error("Der kunne ikke findes en patient med dette CPR nr.");
+            }
         }
     }
-    
-
 }
