@@ -1,7 +1,7 @@
 ﻿@inject EmployeeService _employeeService
 @inject NavigationManager _navMan
 
-
+<AuthorizeView>
 <header class="navbar navbar-expand-md navbar-light d-print-none">
     <div class="container-xl">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu">
@@ -166,10 +166,13 @@
                           style="background-image: url('./static/avatars/(2).jpg')">
                     </span>
                     <div class="d-none d-xl-block ps-2">
-                        <div>
-                            Mathias Olsen
-                        </div>
-                        <div class="mt-1 small text-muted">Min rolle</div>
+                            <div>
+                                    @context.User.Claims.FirstOrDefault(x => x.Type =="firstname").Value
+                                    @context.User.Claims.FirstOrDefault(x => x.Type =="lastname").Value
+                            </div>
+                        <div class="mt-1 small text-muted">
+                            @_employeeService.ConvertRole(context.User.Claims.FirstOrDefault(x => x.Type =="gruppe").Value)
+                        </div> 
                     </div>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
@@ -312,9 +315,14 @@
         </div>
     </div>
 </div>
+</AuthorizeView>
 
 
 @code {
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
 
     public string SearchCPR { get; set; }
 
@@ -338,6 +346,8 @@
             if (user != null)
             {
                 _navMan.NavigateTo("/Patient/" + SearchCPR);
+                SearchCPR = "";
+                StateHasChanged();
             }
             else
             {

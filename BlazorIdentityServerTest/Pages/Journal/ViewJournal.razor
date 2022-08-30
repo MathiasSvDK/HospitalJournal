@@ -287,7 +287,7 @@
         Hospital newHospital = _hospitalService.Get(SelectedHospital);
 
     //Ask the user if they are sure they want to move the Journal
-        bool ask = await _swalService.Ask("Er du sikker?", string.Format("Når Journalen er overført til <b>{0}</b>, kan den kun retuneres ved at de overføre den tilbage.", newHospital.Name), "Ja, overfør", "Annuller");
+        bool ask = await _swalService.Ask("Er du sikker?", string.Format("Når Journalen er overført til <b>{0}</b>, kan den kun retuneres ved at de overføre den tilbage.", newHospital.Name), "Ja, overfør", "Annuller", SweetAlertIcon.Warning);
         if (ask)
         {
             try

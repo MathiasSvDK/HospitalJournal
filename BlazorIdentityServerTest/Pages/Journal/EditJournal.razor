@@ -179,7 +179,7 @@
 
     public async void SaveChanges()
     {
-        bool ask = await _swalService.Ask("Er du sikker?", "Vil du foretage disse ændringer og sende dem til godkendelse?", "Ja", "Nej");
+        bool ask = await _swalService.Ask("Er du sikker?", "Vil du foretage disse ændringer og sende dem til godkendelse?", "Ja", "Nej", SweetAlertIcon.Warning);
         if (ask)
         {
             try
@@ -273,7 +273,7 @@
             }
             else
             {
-                bool ask = await _swalService.Ask("Fejl", string.Format("Denne journal har allerede en ændring som afventer godkendelse.<br>Hvor vil du navigere til?"), "Til journal", "Forside");
+                bool ask = await _swalService.Ask("Fejl", string.Format("Denne journal har allerede en ændring som afventer godkendelse.<br>Hvor vil du navigere til?"), "Til journal", "Forside", SweetAlertIcon.Error);
                 if (ask)
                 {
                     _navMan.NavigateTo(string.Format("/Patient/{0}/Journal/{1}", PatientCPR, JournalId));

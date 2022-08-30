@@ -24,13 +24,13 @@ public class SwalService
     }
     
     
-    public async Task<bool> Ask(string title, string text)
+    public async Task<bool> Ask(string title, string text, SweetAlertIcon type)
     {
         SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
         {
             Title = title,
             Html = text,
-            Icon = SweetAlertIcon.Error,
+            Icon = type,
             ShowCancelButton = true,
             ConfirmButtonText = "Ja",
             CancelButtonText = "Annuller"
@@ -43,13 +43,13 @@ public class SwalService
     }
     
     
-    public async Task<bool> Ask(string title, string text, string confirmBtn, string cancelBtn)
+    public async Task<bool> Ask(string title, string text, string confirmBtn, string cancelBtn, SweetAlertIcon type)
     {
         SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
         {
             Title = title,
             Html = text,
-            Icon = SweetAlertIcon.Error,
+            Icon = type,
             ShowCancelButton = true,
             ConfirmButtonText = confirmBtn,
             CancelButtonText = cancelBtn
