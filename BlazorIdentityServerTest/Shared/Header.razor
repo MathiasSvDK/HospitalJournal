@@ -166,13 +166,13 @@
                           style="background-image: url('./static/avatars/(2).jpg')">
                     </span>
                     <div class="d-none d-xl-block ps-2">
-                            <div>
-                                    @context.User.Claims.FirstOrDefault(x => x.Type =="firstname").Value
-                                    @context.User.Claims.FirstOrDefault(x => x.Type =="lastname").Value
-                            </div>
+                        <div>
+                            @context.User.Claims.FirstOrDefault(x => x.Type == "firstname").Value
+                            @context.User.Claims.FirstOrDefault(x => x.Type == "lastname").Value
+                        </div>
                         <div class="mt-1 small text-muted">
-                            @_employeeService.ConvertRole(context.User.Claims.FirstOrDefault(x => x.Type =="gruppe").Value)
-                        </div> 
+                            @_employeeService.ConvertRole(context.User.Claims.FirstOrDefault(x => x.Type == "gruppe").Value)
+                        </div>
                     </div>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
