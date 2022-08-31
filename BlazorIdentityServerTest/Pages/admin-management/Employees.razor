@@ -1,5 +1,5 @@
 @page "/admin/ansatte"
-@using Microsoft.EntityFrameworkCore
+@using BlazorIdentityServerTest.Extensions
 @inject EmployeeService _employeeService
 @inject AttachmentService _attachmentService
 @inject IJSRuntime JS
@@ -126,7 +126,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Ny medarbejder</h5>
-                <button @onclick="ClearNewEmployee" type="button" class="btn-close" data-bs-dismiss="modal"
+                <button @onclick="CloseUpdateEmployee" type="button" class="btn-close" data-bs-dismiss="modal"
                         aria-label="Close">
                 </button>
             </div>
@@ -242,7 +242,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <a class="btn btn-link link-secondary" data-bs-dismiss="modal" @onclick="ClearNewEmployee">
+                <a class="btn btn-link link-secondary" data-bs-dismiss="modal" @onclick="CloseUpdateEmployee">
                     Annuller
                 </a>
                 @if (Updating)
@@ -329,12 +329,17 @@
 
     public async void ShowUpdateEmployee(ApplicationUser user)
     {
-        NewEmployee = user;
+        NewEmployee = user.DeepClone();
         Updating = true;
         await JS.InvokeVoidAsync("journalNewEmployee");
     }
     
 
+    public object Clone() {
+        return this.MemberwiseClone();
+    }
+    
+    
     public async void ShowCreateEmployee()
     {
         NewEmployee = new ApplicationUser();
@@ -346,11 +351,8 @@
     public void CloseUpdateEmployee()
     {
         Updating = false;
-        ClearNewEmployee();
+        NewEmployee = new ApplicationUser();
     }
-
-
-    
     
 
 
@@ -392,14 +394,23 @@
     }
 
 
-    public void ClearNewEmployee()
-    {
-    }
-
 
     public async void Fire(ApplicationUser emp)
     {
+        bool answer = await _swalService.Ask("Er du sikker?", String.Format("Du er ved at fyre {0} som medarbejder",emp.Firstname), "Ja", "Nej", SweetAlertIcon.Warning);
+        if (answer)
+        {
+            try
+            {
+                await _userManager.DeleteAsync(emp);
+                await _swalService.Success(string.Format("{0} er blevet fyret", emp.Firstname));
+            }
+            catch (Exception e)
+            {
+                await _swalService.Error("Der skete en fejl ved fyring af medarbejder.");
+            }
+            
+        }
     }
-
 
 }
