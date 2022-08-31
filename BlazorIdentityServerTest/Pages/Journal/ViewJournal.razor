@@ -1,10 +1,10 @@
 @page "/Patient/{PatientCPR:int}/Journal/{JournalId:int}"
-@inject JournalService _journalService
-@inject AttachmentService _attachmentService
-@inject LogsService _logsService
+@inject IJournalService _journalService
+@inject IAttachmentService _attachmentService
+@inject ILogsService _logsService
 @inject IJSRuntime JS
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject HospitalService _hospitalService
+@inject IHospitalService _hospitalService
 
 @if (Creator != null)
 {

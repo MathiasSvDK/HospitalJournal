@@ -1,6 +1,6 @@
 @page "/Patient/{PatientCPR:int}/Journal/{JournalId:int}/edit"
-@inject JournalService _journalService
-@inject AttachmentService _attachmentService
+@inject IJournalService _journalService
+@inject IAttachmentService _attachmentService
 @inject UserManager<ApplicationUser> _userManager
 @inject NavigationManager _navMan
 @inject AuthenticationStateProvider AuthenticationStateProvider

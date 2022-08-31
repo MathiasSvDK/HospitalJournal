@@ -1,7 +1,7 @@
 @page "/admin/ansatte"
 @using BlazorIdentityServerTest.Extensions
-@inject EmployeeService _employeeService
-@inject AttachmentService _attachmentService
+@inject IEmployeeService _employeeService
+@inject IAttachmentService _attachmentService
 @inject IJSRuntime JS
 
 
@@ -332,6 +332,10 @@
         }
     }
 
+    ///<summary>
+    /// This function shows a modal for updating a employee
+    ///<param name="user">A identity user</param>
+    /// </summary>
     public async void ShowUpdateEmployee(ApplicationUser user)
     {
         NewEmployee = user.DeepClone();
@@ -340,11 +344,10 @@
     }
     
 
-    public object Clone() {
-        return this.MemberwiseClone();
-    }
     
-    
+    ///<summary>
+    /// This function shows a modal for creating a new employee
+    /// </summary>
     public async void ShowCreateEmployee()
     {
         NewEmployee = new ApplicationUser();
@@ -353,6 +356,11 @@
     }
 
 
+    ///<summary>
+    /// This function creates a new object for NewEmployee and set updating to false.
+    /// This is used when closing the either update or create modal
+    ///<param name="user">A identity user</param>
+    /// </summary>
     public void CloseUpdateEmployee()
     {
         Updating = false;
@@ -361,6 +369,11 @@
     
 
 
+    ///<summary>
+    /// This function handles uploading profile pictures when creating or updating a user.
+    /// This is then uploadedd to S3 using the attachmentservice
+    ///<param name="e">A file to upload using "InputFile" html tag</param>
+    /// </summary>
     public async void LoadFiles(InputFileChangeEventArgs e)
     {
         Loading = true;
@@ -382,6 +395,10 @@
     }
 
 
+    ///<summary>
+    /// Create a new employee
+    ///<param name="user">A identity user</param>
+    /// </summary>
     public async void CreateEmployee()
     {
         try

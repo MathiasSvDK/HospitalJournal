@@ -1,7 +1,7 @@
 @using Microsoft.AspNetCore.Identity;
 @inject UserManager<ApplicationUser> UserManager;
 @inject SignInManager<ApplicationUser> _signinManager;
-@inject EmployeeService _employeeService
+@inject IEmployeeService _employeeService
 @inject IJSRuntime JS
 
 <IsLoading Loading="@Loading"></IsLoading>

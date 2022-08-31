@@ -14,6 +14,7 @@ using BlazorIdentityServerTest.Services;
 using BlazorIdentityServerTest.Models;
 using CurrieTechnologies.Razor.SweetAlert2;
 using Contabo.ObjectStorage.S3;
+using BlazorIdentityServerTest.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,7 +36,7 @@ ContaboS3Settings.Configure(accessKey, secretKey, s3TenantId, ContaboS3RegionEnd
 
 
 builder.Services.AddDefaultIdentity<ApplicationUser>()
-    .AddSignInManager<CustomSignInManager>()
+    //.AddSignInManager<CustomSignInManager>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 
@@ -45,11 +46,11 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ApplicationUser>>();
 builder.Services.AddSingleton<WeatherForecastService>();
-builder.Services.AddScoped<EmployeeService>();
-builder.Services.AddScoped<HospitalService>();
-builder.Services.AddScoped<JournalService>();
-builder.Services.AddScoped<SwalService>();
-builder.Services.AddScoped<LogsService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IHospitalService, HospitalService>();
+builder.Services.AddScoped<IJournalService, JournalService>();
+builder.Services.AddScoped<ISwalService, SwalService>();
+builder.Services.AddScoped<ILogsService, LogsService>();
 builder.Services.AddDbContext<HospitalContext>();
 builder.Services.AddDbContext<JournalContext>();
 builder.Services.AddDbContext<ApplicationDbContext>();

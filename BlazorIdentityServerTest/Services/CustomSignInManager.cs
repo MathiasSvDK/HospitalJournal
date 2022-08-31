@@ -10,12 +10,18 @@ using BlazorIdentityServerTest.Models;
 
 namespace BlazorIdentityServerTest.Services
 {
+    //TODO: Remove this?
     public class CustomSignInManager : SignInManager<ApplicationUser>
     {
         public CustomSignInManager(UserManager<ApplicationUser> userManager, IHttpContextAccessor contextAccessor, IUserClaimsPrincipalFactory<ApplicationUser> claimsFactory, IOptions<IdentityOptions> optionsAccessor, ILogger<SignInManager<ApplicationUser>> logger, IAuthenticationSchemeProvider schemes, IUserConfirmation<ApplicationUser> confirmation) : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
         {
         }
 
+        ///<summary>
+        /// When signing in on the identity server, some extra claims are needed, these are added here
+        ///<param name="user">The user signin in</param>
+        /// <returns>The user signin in with extra claims from the identity server</returns>
+        /// </summary>
         public override async Task<ClaimsPrincipal> CreateUserPrincipalAsync(ApplicationUser user)
         {
             var principal = await base.CreateUserPrincipalAsync(user);
