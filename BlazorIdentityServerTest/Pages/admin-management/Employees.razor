@@ -1,272 +1,389 @@
 @page "/admin/ansatte"
+@using Microsoft.EntityFrameworkCore
 @inject EmployeeService _employeeService
+@inject AttachmentService _attachmentService
+<IsLoading Loading="@Loading"></IsLoading>
 
 <div class="page-body">
-	<div class="container-xl">
-		<div class="page-header mb-3">
-			<div class="row align-items-center mw-100">
-				<div class="col">
-					<div class="mb-1">
-						<ol class="breadcrumb" aria-label="breadcrumbs">
-							<li class="breadcrumb-item"><a href="/admin">Administrator</a></li>
-							<li class="breadcrumb-item active" aria-current="page"><a>Ansatte</a></li>
-						</ol>
-					</div>
-					<h2 class="page-title">
-						<span class="text-truncate">Ansatte</span>
-					</h2>
-				</div>
-				<div class="col-auto">
-					<div class="btn-list">
-						<a data-bs-toggle="modal" data-bs-target="#modal-newemployee" class="btn btn-primary">
-							Tilføj medarbejder
-						</a>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-12 col-md-4 px-4">
-				<NavMenu CurrentPage="ansatte" />
-			</div>
-			<div class="col-12 col-md-8">
-				<div class="row">
-					<div class="col-12">
-						<div class="row row-cards">
-							@foreach (int role in EmployeeList.Select(x => x.Role).OrderBy(x => x).Distinct().ToList())
-							{
-								<p style="font-weight:bolder;margin-bottom:0;margin-top:10px;">
-									@_employeeService.ConvertRole(role)</p>
-								@foreach (Employee item in EmployeeList.Where(x => x.Role == role).OrderBy(x =>
-										x.Firstname))
-								{
-									<div class="col-md-6 col-lg-3">
-										<div class="card employee">
-											<svg xmlns="http://www.w3.org/2000/svg"
-										class="employee-fire icon icon-tabler icon-tabler-trash-x" width="24"
-										height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-										fill="none" stroke-linecap="round" stroke-linejoin="round"
-										@onclick="() => Fire(item)">
-												<path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-												<path d="M4 7h16"></path>
-												<path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
-												<path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
-												<path d="M10 12l4 4m0 -4l-4 4"></path>
-											</svg>
+    <div class="container-xl">
+        <div class="page-header mb-3">
+            <div class="row align-items-center mw-100">
+                <div class="col">
+                    <div class="mb-1">
+                        <ol class="breadcrumb" aria-label="breadcrumbs">
+                            <li class="breadcrumb-item">
+                                <a href="/admin">Administrator</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <a>Ansatte</a>
+                            </li>
+                        </ol>
+                    </div>
+                    <h2 class="page-title">
+                        <span class="text-truncate">Ansatte</span>
+                    </h2>
+                </div>
+                <div class="col-auto">
+                    <div class="btn-list">
+                        <a data-bs-toggle="modal" data-bs-target="#modal-newemployee" class="btn btn-primary">
+                            Tilføj medarbejder
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-4 px-4">
+                <NavMenu CurrentPage="ansatte"/>
+            </div>
+            <div class="col-12 col-md-8">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row row-cards">
+
+                            @foreach (int role in EmployeesList.Select(x => x.Role).OrderBy(x => x).Distinct().ToList())
+                            {
+                                <p style="font-weight:bolder;margin-bottom:0;margin-top:10px;">
+                                    @_employeeService.ConvertRole(role)
+                                </p>
 
 
-											<div class="card-body p-4 text-center">
-												<span class="avatar avatar-xl mb-3 avatar-rounded"
-											style="background-image: url('./static/avatars/(@item.Id).jpg')"></span>
-												<h3 class="m-0 mb-1">@item.Firstname @item.Lastname</h3>
-												<div class="text-muted">@_employeeService.ConvertRole(item.Role)</div>
-											</div>
-											<div class="d-flex">
-												<a href="mailto:@item.Email" class="card-btn">
-													<svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-muted"
-												width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-												stroke="currentColor" fill="none" stroke-linecap="round"
-												stroke-linejoin="round">
-														<path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-														<rect x="3" y="5" width="18" height="14" rx="2"></rect>
-														<polyline points="3 7 12 13 21 7"></polyline>
-													</svg>
-													Email
-												</a>
-												<a href="tel:@item.Mobilnr" class="card-btn">
-													<svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-muted"
-												width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
-												stroke="currentColor" fill="none" stroke-linecap="round"
-												stroke-linejoin="round">
-														<path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-														<path
-													d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2">
-														</path>
-													</svg>
-													Ring
-												</a>
-											</div>
-										</div>
-									</div>
-								}
-							}
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+                                foreach (ApplicationUser item in EmployeesList.Where(x => x.Role == role))
+                                {
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="card employee">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 class="employee-fire icon icon-tabler icon-tabler-trash-x" width="24"
+                                                 height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                 fill="none" stroke-linecap="round" stroke-linejoin="round"
+                                                 @onclick="() => Fire(item)">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                <path d="M4 7h16"></path>
+                                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                                                <path d="M10 12l4 4m0 -4l-4 4"></path>
+                                            </svg>
+                                            
+                                            <svg data-bs-toggle="modal" data-bs-target="#modal-newemployee" @onclick="() => ShowUpdateEmployee(item)" xmlns="http://www.w3.org/2000/svg" style="top:40px;" class=" employee-fire icon icon-tabler icon-tabler-pencil" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4"></path>
+                                                <line x1="13.5" y1="6.5" x2="17.5" y2="10.5"></line>
+                                            </svg>
+
+                                            <div class="card-body p-4 text-center">
+                                                <span class="avatar avatar-xl mb-3 avatar-rounded"
+                                                      style="background-image: url(@item.Pfp)">
+                                                </span>
+                                                <h3 class="m-0 mb-1">@item.Firstname @item.Lastname</h3>
+                                                <div class="text-muted">@_employeeService.ConvertRole(item.Role)</div>
+                                            </div>
+                                            <div class="d-flex">
+                                                <a href="mailto:@item.Email" class="card-btn">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-muted"
+                                                         width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                                                         stroke="currentColor" fill="none" stroke-linecap="round"
+                                                         stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                        <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                                                        <polyline points="3 7 12 13 21 7"></polyline>
+                                                    </svg>
+                                                    Email
+                                                </a>
+                                                <a href="tel:@item.Mobilnr" class="card-btn">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-muted"
+                                                         width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                                                         stroke="currentColor" fill="none" stroke-linecap="round"
+                                                         stroke-linejoin="round">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                        <path
+                                                            d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2">
+                                                        </path>
+                                                    </svg>
+                                                    Ring
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 
-
-
 <div class="modal modal-blur fade" id="modal-newemployee" tabindex="-1" style="display: none;" aria-hidden="true">
-	<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Ny medarbejder</h5>
-				<button @onclick="ClearNewEmployee" type="button" class="btn-close" data-bs-dismiss="modal"
-					aria-label="Close"></button>
-			</div>
-			<div class="modal-body">
-				<div class="row">
-					<div class="col-lg-6">
-						<div class="mb-3">
-							<label class="form-label">Fornavn</label>
-							<input type="text" class="form-control" @bind="NewEmployee.Firstname">
-						</div>
-					</div>
-					<div class="col-lg-6">
-						<div class="mb-3">
-							<label class="form-label">Efternavn</label>
-							<input type="text" class="form-control" @bind="NewEmployee.Lastname">
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-lg-6">
-						<div class="mb-3">
-							<label class="form-label">Mobil nr</label>
-							<input type="text" class="form-control" @bind="NewEmployee.Mobilnr">
-						</div>
-					</div>
-					<div class="col-lg-6">
-						<div class="mb-3">
-							<label class="form-label">Email</label>
-							<input type="email" class="form-control" @bind="NewEmployee.Email">
-						</div>
-					</div>
-				</div>
-				<label class="form-label">Rolle</label>
-				<div class="form-selectgroup-boxes row mb-3">
-					<div class="col-lg-4">
-						<label @onclick="() => NewEmployee.Role = 1" class="form-selectgroup-item">
-							<input type="radio" name="report-type" value="1" class="form-selectgroup-input" checked=""
-								data-np-invisible="1">
-							<span class="form-selectgroup-label d-flex align-items-center p-3">
-								<span class="me-3">
-									<span class="form-selectgroup-check"></span>
-								</span>
-								<span class="form-selectgroup-label-content">
-									<span class="form-selectgroup-title strong mb-1">Læge</span>
-								</span>
-							</span>
-						</label>
-					</div>
-					<div class="col-lg-4">
-						<label @onclick="() => NewEmployee.Role = 2" class="form-selectgroup-item">
-							<input type="radio" name="report-type" value="1" class="form-selectgroup-input"
-								data-np-invisible="1">
-							<span class="form-selectgroup-label d-flex align-items-center p-3">
-								<span class="me-3">
-									<span class="form-selectgroup-check"></span>
-								</span>
-								<span class="form-selectgroup-label-content">
-									<span class="form-selectgroup-title strong mb-1">Sygeplejerske</span>
-								</span>
-							</span>
-						</label>
-					</div>
-					<div class="col-lg-4">
-						<label @onclick="() => NewEmployee.Role = 0" class="form-selectgroup-item">
-							<input type="radio" name="report-type" value="1" class="form-selectgroup-input"
-								data-np-invisible="1">
-							<span class="form-selectgroup-label d-flex align-items-center p-3">
-								<span class="me-3">
-									<span class="form-selectgroup-check"></span>
-								</span>
-								<span class="form-selectgroup-label-content">
-									<span class="form-selectgroup-title strong mb-1">Admin</span>
-								</span>
-							</span>
-						</label>
-					</div>
-				</div>
-			</div>
-			<div class="modal-footer">
-				<a class="btn btn-link link-secondary" data-bs-dismiss="modal" @onclick="ClearNewEmployee">
-					Annuller
-				</a>
-				<a @onclick="CreateEmployee" class="btn btn-primary ms-auto" data-bs-dismiss="modal">
-					<!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-					<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
-						stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
-						stroke-linejoin="round">
-						<path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-						<line x1="12" y1="5" x2="12" y2="19"></line>
-						<line x1="5" y1="12" x2="19" y2="12"></line>
-					</svg>
-					Opret medarbejder
-				</a>
-			</div>
-		</div>
-	</div>
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ny medarbejder</h5>
+                <button @onclick="ClearNewEmployee" type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <span class="avatar avatar-md mb-3 avatar-rounded" style="background-image: url(@NewEmployee.Pfp)"></span>
+                            </div>
+                            <div class="col-md-4" style="margin-top:12px;">
+                                <InputFile accept="@("." + FileTypes.Aggregate((a, b) => a + ", ." + b))" OnChange="@LoadFiles" class="form-control"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label class="form-label">CPR Nr</label>
+                            <input type="text" class="form-control" @bind="NewEmployee.UserName">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label class="form-label">Fornavn</label>
+                            <input type="text" class="form-control" @bind="NewEmployee.Firstname">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label class="form-label">Efternavn</label>
+                            <input type="text" class="form-control" @bind="NewEmployee.Lastname">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label class="form-label">Mobil nr</label>
+                            <input type="text" class="form-control" @bind="NewEmployee.Mobilnr">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" @bind="NewEmployee.Email">
+                        </div>
+                    </div>
+                </div>
+                <label class="form-label">Rolle</label>
+                <div class="form-selectgroup-boxes row mb-3">
+                    <div class="col-lg-4">
+                        <label @onclick="() => NewEmployee.Role = 1" class="form-selectgroup-item">
+                            @if (NewEmployee.Role == 1)
+                            {
+                                <input type="radio" name="report-type" value="1" class="form-selectgroup-input" checked>
+                            }
+                            else
+                            {
+                                <input type="radio" name="report-type" value="1" class="form-selectgroup-input">
+                            }
+                            <span class="form-selectgroup-label d-flex align-items-center p-3">
+                                <span class="me-3">
+                                    <span class="form-selectgroup-check"></span>
+                                </span>
+                                <span class="form-selectgroup-label-content">
+                                    <span class="form-selectgroup-title strong mb-1">Læge</span>
+                                </span>
+                            </span>
+                        </label>
+                    </div>
+                    <div class="col-lg-4">
+                        <label @onclick="() => NewEmployee.Role = 2" class="form-selectgroup-item">
+                            @if (NewEmployee.Role == 2)
+                            {
+                                <input type="radio" name="report-type" value="1" class="form-selectgroup-input" checked>
+                            }
+                            else
+                            {
+                                <input type="radio" name="report-type" value="1" class="form-selectgroup-input">
+                            }
+                            <span class="form-selectgroup-label d-flex align-items-center p-3">
+                                <span class="me-3">
+                                    <span class="form-selectgroup-check"></span>
+                                </span>
+                                <span class="form-selectgroup-label-content">
+                                    <span class="form-selectgroup-title strong mb-1">Sygeplejerske</span>
+                                </span>
+                            </span>
+                        </label>
+                    </div>
+                    <div class="col-lg-4">
+                        <label @onclick="() => NewEmployee.Role = 0" class="form-selectgroup-item">
+                            @if (NewEmployee.Role == 0)
+                            {
+                                <input type="radio" name="report-type" value="1" class="form-selectgroup-input" checked>
+                            }
+                            else
+                            {
+                                <input type="radio" name="report-type" value="1" class="form-selectgroup-input">
+                            }
+                            <span class="form-selectgroup-label d-flex align-items-center p-3">
+                                <span class="me-3">
+                                    <span class="form-selectgroup-check"></span>
+                                </span>
+                                <span class="form-selectgroup-label-content">
+                                    <span class="form-selectgroup-title strong mb-1">Admin</span>
+                                </span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-link link-secondary" data-bs-dismiss="modal" @onclick="ClearNewEmployee">
+                    Annuller
+                </a>
+                @if (Updating)
+                {
+                    <a @onclick="UpdateEmployee" class="btn btn-primary ms-auto" data-bs-dismiss="modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                             stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Opdater medarbejder
+                    </a>
+                }
+                @if (!Updating)
+                {
+                    <a @onclick="CreateEmployee" class="btn btn-primary ms-auto" data-bs-dismiss="modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                             stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Opret medarbejder
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
 </div>
 
 
 @code {
-	public List<Employee> EmployeeList { get; set; }
-	public Employee NewEmployee { get; set; }
-	protected override async Task OnInitializedAsync()
-	{
-		NewEmployee = new Employee();
-		EmployeeList = _employeeService.GetEmployees(1);
-	}
+    public ApplicationUser NewEmployee { get; set; }
+    public bool Loading { get; set; }
 
-	public async void CreateEmployee()
-	{
-		try
-		{
-			_employeeService.AddEmployee(NewEmployee);
-			_employeeService.Save();
-			EmployeeList = _employeeService.GetEmployees(1);
-			NewEmployee = new Employee();
-			await Swal.FireAsync("Fuldført", "Medarbejderen er blevet tilføjet", "success");
-		}
-		catch (System.Exception)
-		{
-			await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen. (900)", "error");
-		}
-	}
+    public List<string> FileTypes { get; set; }
+    public List<string> PreviewAllowed { get; set; }
 
-	public void ClearNewEmployee()
-	{
-		NewEmployee = new Employee();
-	}
+    public List<ApplicationUser> EmployeesList { get; set; }
+    public ApplicationUser User { get; set; }
+    public bool Updating { get; set; }
 
-	public async void Fire(Employee emp)
-	{
-		SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
-		{
-			Title = "Er du sikker?",
-			Html = string.Format("Du er ved at fjerne <b><u>{0}</u></b> som medarbejder!",emp.Firstname),
-			Icon = SweetAlertIcon.Warning,
-			ShowCancelButton = true,
-			ConfirmButtonText = "Ja, fjern!",
-			CancelButtonText = "Annuller"
-		});
+    protected override async Task OnInitializedAsync()
+    {
+        Updating = false;
+        NewEmployee = new ApplicationUser();
 
-		if (!string.IsNullOrEmpty(result.Value))
-		{
-
-			try
-			{
-				_employeeService.Fire(emp);
-				_employeeService.Save();
-				EmployeeList = _employeeService.GetEmployees(1);
-				StateHasChanged();
-				await Swal.FireAsync("Fuldført", string.Format("{0} er blevet fjernet", emp.Firstname), "success");
-			}
-			catch (System.Exception)
-			{
-				await Swal.FireAsync("Oops...", "Der skete en fejl. Prøv igen. (901)", "error");
-			}
-		}
+        FileTypes = new List<string>()
+        {
+            "png", "jpeg", "jpg", "zip", "pdf"
+        };
+        PreviewAllowed = new List<string>()
+        {
+            "png", "jpeg", "jpg"
+        };
 
 
+        EmployeesList = _userManager.Users.ToList();
+
+        AuthenticationState user = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        User = await _userManager.GetUserAsync(user.User);
+
+        NewEmployee.HospitalId = User.HospitalId;
+
+        EmployeesList = EmployeesList.Where(x => x.HospitalId == User.HospitalId && x.Role != 3).ToList();
+    }
+
+    public async void UpdateEmployee()
+    {
+        try
+        {
+            await _userManager.UpdateAsync(NewEmployee);
+            Updating = false;
+            NewEmployee = new ApplicationUser();
+            await _swalService.Success("Medarbejderen er blevet opdateret");
+        }
+        catch (Exception e)
+        {
+            await _swalService.Error("Det skete en fejl ved opdatering af medarbejder");
+        }
+    }
+    
+    public void ShowUpdateEmployee(ApplicationUser user)
+    {
+        NewEmployee = user;
+        Updating = true;
+    }
+
+    public void CloseUpdateEmployee()
+    {
+        Updating = false;
+        ClearNewEmployee();
+    }
+    
+
+    public async void LoadFiles(InputFileChangeEventArgs e)
+    {
+        Loading = true;
+        try
+        {
+            Attachment newFile = await _attachmentService.UploadFile(e.File, e.File.Name, 0);
+            NewEmployee.Pfp = newFile.Uri;
+            await InvokeAsync(() =>
+            {
+                Loading = false;
+                StateHasChanged();
+            });
+        }
+        catch (Exception)
+        {
+            Loading = false;
+            await Swal.FireAsync("Oops...", "Filen er for stor. Max størrelse er 50 MB", "error");
+        }
+    }
 
 
+    public async void CreateEmployee()
+    {
+        try
+        {
+            NewEmployee.NormalizedUserName = NewEmployee.UserName;
+            await _userManager.CreateAsync(NewEmployee);
+            EmployeesList.Add(NewEmployee);
 
-	}
+            await _swalService.Success("Medarbejder er blevet oprettet");
+        }
+        catch (Exception e)
+        {
+            await _swalService.Error("Medarbejderen kunne ikke oprettes");
+        }
+    }
+
+
+    public void ClearNewEmployee()
+    {
+    }
+
+
+    public async void Fire(ApplicationUser emp)
+    {
+    }
+
+
 }
