@@ -2,6 +2,9 @@
 @using Microsoft.EntityFrameworkCore
 @inject EmployeeService _employeeService
 @inject AttachmentService _attachmentService
+@inject IJSRuntime JS
+
+
 <IsLoading Loading="@Loading"></IsLoading>
 
 <div class="page-body">
@@ -25,7 +28,7 @@
                 </div>
                 <div class="col-auto">
                     <div class="btn-list">
-                        <a data-bs-toggle="modal" data-bs-target="#modal-newemployee" class="btn btn-primary">
+                        <a @onclick="ShowCreateEmployee" class="btn btn-primary">
                             Tilføj medarbejder
                         </a>
                     </div>
@@ -63,8 +66,8 @@
                                                 <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
                                                 <path d="M10 12l4 4m0 -4l-4 4"></path>
                                             </svg>
-                                            
-                                            <svg data-bs-toggle="modal" data-bs-target="#modal-newemployee" @onclick="() => ShowUpdateEmployee(item)" xmlns="http://www.w3.org/2000/svg" style="top:40px;" class=" employee-fire icon icon-tabler icon-tabler-pencil" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+
+                                            <svg @onclick="() => ShowUpdateEmployee(item)" xmlns="http://www.w3.org/2000/svg" style="top:40px;" class=" employee-fire icon icon-tabler icon-tabler-pencil" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                                                 <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4"></path>
                                                 <line x1="13.5" y1="6.5" x2="17.5" y2="10.5"></line>
@@ -245,12 +248,11 @@
                 @if (Updating)
                 {
                     <a @onclick="UpdateEmployee" class="btn btn-primary ms-auto" data-bs-dismiss="modal">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
-                             stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
-                             stroke-linejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
+                            <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path>
+                            <path d="M16 5l3 3"></path>
                         </svg>
                         Opdater medarbejder
                     </a>
@@ -324,19 +326,33 @@
             await _swalService.Error("Det skete en fejl ved opdatering af medarbejder");
         }
     }
-    
-    public void ShowUpdateEmployee(ApplicationUser user)
+
+    public async void ShowUpdateEmployee(ApplicationUser user)
     {
         NewEmployee = user;
         Updating = true;
+        await JS.InvokeVoidAsync("journalNewEmployee");
     }
+    
+
+    public async void ShowCreateEmployee()
+    {
+        NewEmployee = new ApplicationUser();
+        Updating = false;
+        await JS.InvokeVoidAsync("journalNewEmployee");
+    }
+
 
     public void CloseUpdateEmployee()
     {
         Updating = false;
         ClearNewEmployee();
     }
+
+
     
+    
+
 
     public async void LoadFiles(InputFileChangeEventArgs e)
     {

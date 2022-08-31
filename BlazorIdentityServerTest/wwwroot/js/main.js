@@ -167,3 +167,7 @@ function journalMoveJournal() {
     var myModal = new bootstrap.Modal(document.getElementById("modal-movejournal"), {});
     myModal.show();
 }
+function journalNewEmployee() {
+    var myModal = new bootstrap.Modal(document.getElementById("modal-newemployee"), {});
+    myModal.show();
+}
