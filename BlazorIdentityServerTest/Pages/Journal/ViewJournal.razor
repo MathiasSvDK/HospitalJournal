@@ -342,13 +342,22 @@
                 {
                     attIds = Approve.NewAttachments.Split(",").Select(x => Convert.ToInt32(x)).ToList();
                 }
-                catch (Exception e)
+                catch (Exception a)
                 {
-                    attIds.Add(Convert.ToInt32(Approve.NewAttachments));
+                    try
+                    {
+                        attIds.Add(Convert.ToInt32(Approve.NewAttachments));
+                    }
+                    catch (Exception b)
+                    {
+                        //Der er ingen nye attachments
+                    }
                 }
 
-
-                Approve.NewAttachmentsList = _attachmentService.GetAttachments(attIds);
+                if (attIds.Count > 0)
+                {
+                    Approve.NewAttachmentsList = _attachmentService.GetAttachments(attIds);
+                }
             }
     //The journal is found. Get the attachments
             if (Journal != null)

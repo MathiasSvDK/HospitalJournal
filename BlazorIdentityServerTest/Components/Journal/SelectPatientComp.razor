@@ -201,8 +201,6 @@
         //Default values. Role 3 is for patient and always confirm the email.
         NewPatient.Role = 3;
         NewPatient.EmailConfirmed = true;
-        CPRnr = "200";
-        LookupPatient();
     }
     
     public async void LookupPatient()
@@ -284,6 +282,7 @@
                     PatientUser = await UserManager.FindByNameAsync(NewPatient.NormalizedUserName);
                     //Mark the patient as found to be able to use the next button
                     NextAvailable = true;
+                    journal.AssignedEmployee = Convert.ToInt32(PatientUser.NormalizedUserName);
                     StateHasChanged();
                 }
                 catch (System.Exception)

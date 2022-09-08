@@ -61,6 +61,8 @@
         </div>
     </div>
 </div>
+Emp @Journal.AssignedPatient
+<div @onclick="StateHasChanged">e</div>
 
 @code {
 
@@ -93,8 +95,9 @@
             att.JournalId = Journal.Id;
             _attachmentService.Add(att);
             await _attachmentService.SaveAsync();
+            _navigationManager.NavigateTo("/Patient/"+Journal.AssignedPatient+"/Journal/"+Journal.Id);
+
         }
-    //_NavigationManager.NavigateTo("Journal/"+Journal.Id);
     }
 
     public void NextStep()

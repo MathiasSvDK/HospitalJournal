@@ -54,7 +54,7 @@ builder.Services.AddScoped<ILogsService, LogsService>();
 builder.Services.AddDbContext<HospitalContext>();
 builder.Services.AddDbContext<JournalContext>();
 builder.Services.AddDbContext<ApplicationDbContext>();
-builder.Services.AddScoped<AttachmentService>();
+builder.Services.AddScoped<IAttachmentService, AttachmentService>();
 builder.Services.AddSweetAlert2();
 
 

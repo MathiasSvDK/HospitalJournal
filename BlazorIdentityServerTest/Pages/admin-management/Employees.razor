@@ -328,7 +328,7 @@
         }
         catch (Exception e)
         {
-            await _swalService.Error("Det skete en fejl ved opdatering af medarbejder");
+            await _swalService.Error(e.ToString());
         }
     }
 
@@ -338,7 +338,7 @@
     /// </summary>
     public async void ShowUpdateEmployee(ApplicationUser user)
     {
-        NewEmployee = user.DeepClone();
+        NewEmployee = user;
         Updating = true;
         await JS.InvokeVoidAsync("journalNewEmployee");
     }
@@ -406,7 +406,7 @@
             NewEmployee.NormalizedUserName = NewEmployee.UserName;
             await _userManager.CreateAsync(NewEmployee);
             EmployeesList.Add(NewEmployee);
-
+            StateHasChanged();
             await _swalService.Success("Medarbejder er blevet oprettet");
         }
         catch (Exception e)
